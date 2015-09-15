@@ -44,27 +44,6 @@ Lib/
 build32/
 build64/
 buildWin/
-Codec-Win/codec_core.dir/
-Codec-Win/CodecHarness.dir/
-Codec-Win/CoreTestRunner.dir/
-Codec-Win/Dora.dir/
-Codec-Win/DoraTestRunner.dir/
-core/lib/win/
-dora/lib/win/
-win/lotr_vfw/bin/
-win/lotr_vfw/src/base/Win32/
-win/lotr_vfw/src/base/x64/
-win/lotr_vfw/src/dora_codec/Win32/
-win/lotr_vfw/src/dora_codec/x64/
-win/lotr_vfw/src/prebuilt/Win32/
-win/lotr_vfw/src/prebuilt/x64/
-win/lotr_vfw/src/Win32/
-win/lotr_vfw/src/x64/
-win/lotr_vfw/src.vs2013/dora_codec/Win32/
-win/lotr_vfw/src.vs2013/dora_codec/x64/
-win/lotr_vfw/src.vs2013/base/Win32/
-win/lotr_vfw/src.vs2013/base/x64/
-qt/LOTR/LOTRComponents/win/bin.vs2013/
 
 # NuGet (Don't check in your packages! Use Package Restore!)
 packages/
