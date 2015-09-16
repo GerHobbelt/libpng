@@ -11,14 +11,14 @@ nuget
    {
       id = libpng-tsc-package;
       version: 1.6.18.0;
-      title: TechSmith Screen Recorder SDK Library;
+      title: libpng;
       authors: { TechSmith Corporation };
       owners: { TechSmith Corporation };
       licenseUrl: "https://github.com/TechSmith/libpng/blob/libpng16/LICENSE";
       projectUrl: "https://github.com/TechSmith/libpng";
       iconUrl: "http://www.libpng.org/pub/png/img_png/pnglogo-blk.jpg";
       requireLicenseAcceptance: false;
-      summary: Screen Recorder SDK library;
+      summary: libpng recompiled from source;
       description: @"Portable Network Graphics support, official libpng repository.
          New features:
          Breaking Changes:"
