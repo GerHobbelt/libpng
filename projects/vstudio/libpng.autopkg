@@ -28,10 +28,10 @@ nuget
 
    dependencies
    {
-      packages
+      packages:
       {
          zlib/1.2.8.8;
-      }
+      };
    };
 
    files
