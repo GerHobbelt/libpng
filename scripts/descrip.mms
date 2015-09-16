@@ -1,5 +1,4 @@
 
-cc_defs = /inc=$(ZLIBSRC)
 c_deb =
 
 .ifdef __DECC__
@@ -23,7 +22,7 @@ libpng.olb : libpng.olb($(OBJS))
 
 
 pngtest.exe : pngtest.obj libpng.olb
-              link pngtest,libpng.olb/lib,$(ZLIBSRC)libz.olb/lib
+              link pngtest,libpng.olb/lib
 
 test : pngtest.exe
    run pngtest
