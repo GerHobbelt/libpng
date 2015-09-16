@@ -31,9 +31,9 @@ nuget
       nestedInclude:
       { 
          #destination = ${d_include}libpng; 
-         ..\..\png.h
-         ..\..\pngconf.h
-         ..\..\pnglibconf.h
+         ..\..\png.h;
+         ..\..\pngconf.h;
+         ..\..\pnglibconf.h;
       };
 
       ("Win32,x64", "v140", "Debug,Release") =>
@@ -41,7 +41,6 @@ nuget
          [${0},${1},${2}]
          {
             lib:    { bin\${0}\${2}\libpng16.lib; }
-            vcpdb:  { bin\${0}\${2}\libpng16.pdb; }
             bin:    { bin\${0}\${2}\libpng16.dll;
                       bin\${0}\${2}\libpng16.pdb; }
          };
