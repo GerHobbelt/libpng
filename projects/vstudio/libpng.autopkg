@@ -21,7 +21,7 @@ nuget
       summary: Screen Recorder SDK library;
       description: @"Portable Network Graphics support, official libpng repository.
          New features:
-         Breaking Changes:
+         Breaking Changes:"
       copyright: "";
       tags: { native, third-party, vs2015, open source, cpp };
    };
