@@ -10,7 +10,7 @@ nuget
    nuspec
    {
       id = libpng-tsc-package;
-      version: 1.6.18.1;
+      version: 1.6.18.2;
       title: libpng;
       authors: { TechSmith Corporation };
       owners: { TechSmith Corporation };
