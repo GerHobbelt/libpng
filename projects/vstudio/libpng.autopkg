@@ -10,7 +10,7 @@ nuget
    nuspec
    {
       id = libpng-tsc-package;
-      version: 1.6.18.3;
+      version: 1.6.18.4;
       title: libpng;
       authors: { TechSmith Corporation };
       owners: { TechSmith Corporation };
@@ -24,6 +24,14 @@ nuget
          Breaking Changes:"
       copyright: "";
       tags: { native, third-party, vs2015, open source, cpp, static, dynamiccpp };
+   };
+
+   dependencies
+   {
+      packages:
+      {
+         zlib.v140.windesktop.msvcstl.static.rt-dyn/1.2.8.8;
+      };
    };
 
    files
