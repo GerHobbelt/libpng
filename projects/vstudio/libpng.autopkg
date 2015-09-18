@@ -10,7 +10,7 @@ nuget
    nuspec
    {
       id = libpng-tsc-package;
-      version: 1.6.18.2;
+      version: 1.6.18.3;
       title: libpng;
       authors: { TechSmith Corporation };
       owners: { TechSmith Corporation };
@@ -35,13 +35,14 @@ nuget
          ..\..\pngconf.h;
          ..\..\pnglibconf.h;
       };
+      vcpdb:          { #destination = ${d_lib}; };
 
       ("Win32,x64", "v140", "Debug,Release") =>
       {
          [${0},${1},${2}]
          {
-            lib:    { lib\${0}\${2}\libpng16.lib;
-                      lib\${0}\${2}\libpng16.pdb; }
+            lib:    { lib\${0}\${2}\libpng16.lib; }
+            vcpdb:  { lib\${0}\${2}\libpng16.pdb; }
          };
       };
    };
