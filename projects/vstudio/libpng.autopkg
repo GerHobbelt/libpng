@@ -19,19 +19,11 @@ nuget
       iconUrl: "http://www.libpng.org/pub/png/img_png/pnglogo-blk.jpg";
       requireLicenseAcceptance: false;
       summary: libpng recompiled from source;
-      description: @"Portable Network Graphics support, official libpng repository.
+      description: @"Portable Network Graphics support.  Compiled with Visual Studio 2015 as a static library.
          New features:
          Breaking Changes:"
       copyright: "";
-      tags: { native, third-party, vs2015, open source, cpp };
-   };
-
-   dependencies
-   {
-      packages:
-      {
-         zlib/1.2.8.8;
-      };
+      tags: { native, third-party, vs2015, open source, cpp, static, dynamiccpp };
    };
 
    files
@@ -48,9 +40,8 @@ nuget
       {
          [${0},${1},${2}]
          {
-            lib:    { bin\${0}\${2}\libpng16.lib; }
-            bin:    { bin\${0}\${2}\libpng16.dll;
-                      bin\${0}\${2}\libpng16.pdb; }
+            lib:    { lib\${0}\${2}\libpng16.lib;
+                      lib\${0}\${2}\libpng16.pdb; }
          };
       };
    };
