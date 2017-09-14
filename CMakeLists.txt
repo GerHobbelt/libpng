@@ -108,6 +108,7 @@ endif()
 
 # Allow the users to switch on/off the use of hardware (SIMD) optimized code.
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
+option(PNG_DISABLE_FILEGEN "Disable dynamic generation of config files" OFF)
 
 # Initialize and show the target architecture variable PNG_TARGET_ARCHITECTURE.
 #
@@ -431,7 +432,7 @@ int main(void) { return 0; }
   file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
 endif()
 
-if(PNG_LIBCONF_HEADER STREQUAL "")
+if(PNG_LIBCONF_HEADER STREQUAL "" AND NOT PNG_DISABLE_FILEGEN)
   # No custom configuration header file has been specified, so we build it
   # from our DFA files and (optionally) out of the user-supplied DFA file.
   # Find an AWK language processor.
@@ -454,7 +455,9 @@ if(NOT PNG_LIBCONF_HEADER STREQUAL "")
   configure_file("${PNG_LIBCONF_HEADER}"
                  "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h"
                  @ONLY)
-  add_custom_target(png_genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_custom_target(png_genfiles)
+  endif()
 elseif(NOT AWK)
   # No AWK program available to generate pnglibconf.h.
   # Configure libpng with pnglibconf.h.prebuilt.
@@ -666,7 +669,9 @@ endif()
 
 if(PNG_SHARED)
   add_library(png_shared SHARED ${libpng_sources})
-  add_dependencies(png_shared png_genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_dependencies(png_shared png_genfiles)
+  endif()
   list(APPEND PNG_LIBRARY_TARGETS png_shared)
   set_target_properties(png_shared
                         PROPERTIES OUTPUT_NAME "${PNG_SHARED_OUTPUT_NAME}"
@@ -704,7 +709,9 @@ endif()
 
 if(PNG_STATIC)
   add_library(png_static STATIC ${libpng_sources})
-  add_dependencies(png_static png_genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_dependencies(png_static png_genfiles)
+  endif()
   list(APPEND PNG_LIBRARY_TARGETS png_static)
   set_target_properties(png_static
                         PROPERTIES OUTPUT_NAME "${PNG_STATIC_OUTPUT_NAME}"
@@ -727,7 +734,9 @@ endif()
 
 if(PNG_FRAMEWORK)
   add_library(png_framework SHARED ${libpng_sources})
-  add_dependencies(png_framework png_genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_dependencies(png_framework png_genfiles)
+  endif()
   list(APPEND PNG_LIBRARY_TARGETS png_framework)
   set_target_properties(png_framework
                         PROPERTIES FRAMEWORK TRUE
