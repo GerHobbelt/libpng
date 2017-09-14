@@ -89,6 +89,7 @@ endif()
 # Allow the users to configure various compilation options.
 option(PNG_DEBUG "Enable debug output" OFF)
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
+option(PNG_DISABLE_FILEGEN "Disable dynamic generation of config files" OFF)
 
 # Initialize and show the target architecture variable PNG_TARGET_ARCHITECTURE.
 #
@@ -353,21 +354,25 @@ int main(void) { return 0; }
   file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
 endif()
 
-# Find an AWK language processor.
-# Start with specific AWK implementations like gawk and nawk, which are
-# known to work with our scripts, then fall back to the system awk.
-find_program(AWK NAMES gawk nawk awk)
-if(AWK)
-  message(STATUS "Found AWK program: ${AWK}")
-else()
-  message(STATUS "Could not find an AWK-compatible program")
+if(NOT PNG_DISABLE_FILEGEN)
+  # Find an AWK language processor.
+  # Start with specific AWK implementations like gawk and nawk, which are
+  # known to work with our scripts, then fall back to the system awk.
+  find_program(AWK NAMES gawk nawk awk)
+  if(AWK)
+    message(STATUS "Found AWK program: ${AWK}")
+  else()
+    message(STATUS "Could not find an AWK-compatible program")
+  endif()
 endif()
 
 if(NOT AWK OR ANDROID OR IOS)
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
-  add_custom_target(png_genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_custom_target(png_genfiles)
+  endif()
 else()
   # Copy the awk scripts, converting their line endings to Unix (LF)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk
@@ -688,7 +693,9 @@ endif()
 
 if(PNG_SHARED)
   add_library(png_shared SHARED ${libpng_sources})
-  add_dependencies(png_shared png_genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_dependencies(png_shared png_genfiles)
+  endif()
   list(APPEND PNG_LIBRARY_TARGETS png_shared)
   set_target_properties(png_shared PROPERTIES
                         OUTPUT_NAME "${PNG_SHARED_OUTPUT_NAME}"
@@ -722,7 +729,9 @@ endif()
 
 if(PNG_STATIC)
   add_library(png_static STATIC ${libpng_sources})
-  add_dependencies(png_static png_genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_dependencies(png_static png_genfiles)
+  endif()
   list(APPEND PNG_LIBRARY_TARGETS png_static)
   set_target_properties(png_static PROPERTIES
                         OUTPUT_NAME "${PNG_STATIC_OUTPUT_NAME}"
@@ -744,7 +753,9 @@ endif()
 
 if(PNG_FRAMEWORK)
   add_library(png_framework SHARED ${libpng_sources})
-  add_dependencies(png_framework png_genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_dependencies(png_framework png_genfiles)
+  endif()
   list(APPEND PNG_LIBRARY_TARGETS png_framework)
   set_target_properties(png_framework PROPERTIES
                         FRAMEWORK TRUE
