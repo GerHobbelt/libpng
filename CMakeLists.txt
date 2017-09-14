@@ -60,6 +60,8 @@ option(PNG_FRAMEWORK "Build OS X framework" OFF)
 option(PNG_DEBUG "Build with debug output" OFF)
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 
+option(PNG_DISABLE_FILEGEN        "Disable dynamic generation of config files" OFF)
+
 set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
 set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
 
@@ -268,7 +270,9 @@ if(UNIX)
   symbol_prefix()
 endif()
 
-find_program(AWK NAMES gawk awk)
+if(NOT PNG_DISABLE_FILEGEN)
+  find_program(AWK NAMES gawk awk)
+endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -276,7 +280,9 @@ if(NOT AWK OR ANDROID)
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
-  add_custom_target(genfiles) # Dummy
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_custom_target(genfiles) # Dummy
+  endif()
 else()
   include(CMakeParseArguments)
   # Generate .chk from .out with awk
@@ -530,7 +536,9 @@ if(PNG_SHARED)
   add_library(png SHARED ${libpng_sources})
   set(PNG_LIB_TARGETS png)
   set_target_properties(png PROPERTIES OUTPUT_NAME ${PNG_LIB_NAME})
-  add_dependencies(png genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_dependencies(png genfiles)
+  endif()
   if(MSVC)
     # msvc does not append 'lib' - do it here to have consistent name
     set_target_properties(png PROPERTIES PREFIX "lib")
@@ -553,7 +561,9 @@ if(PNG_STATIC)
   # does not work without changing name
   set(PNG_LIB_NAME_STATIC png_static)
   add_library(png_static STATIC ${libpng_sources})
-  add_dependencies(png_static genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_dependencies(png_static genfiles)
+  endif()
   # MSVC doesn't use a different file extension for shared vs. static
   # libs.  We are able to change OUTPUT_NAME to remove the _static
   # for all other platforms.
@@ -577,7 +587,9 @@ endif()
 if(PNG_FRAMEWORK)
   set(PNG_LIB_NAME_FRAMEWORK png_framework)
   add_library(png_framework SHARED ${libpng_sources})
-  add_dependencies(png_framework genfiles)
+  if(NOT PNG_DISABLE_FILEGEN)
+    add_dependencies(png_framework genfiles)
+  endif()
   list(APPEND PNG_LIB_TARGETS png_framework)
   set_target_properties(png_framework PROPERTIES
     FRAMEWORK TRUE
