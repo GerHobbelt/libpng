@@ -1,0 +1,79 @@
+
+Property
+{
+	MalterlibPngIncludePath "@(Builtin.Function->GetProperty('Property', 'GeneratedDirectory', 'Group:External.Group:libpng.Target:Lib_png.Target:Lib_png'))"
+}
+
+Compile
+{
+	&
+	{
+		MalterlibUsesLibPng true
+		!DocumentationEnabled true
+ 		CompileDialect "C"
+	}
+
+	SearchPath "@(MalterlibPngIncludePath);@(Compile.SearchPath)"
+}
+
+%Target Lib_png
+{
+	Compile
+	{
+		Warnings Off
+		{
+			!!Compile.Type "C"
+		}
+	}
+	Target
+	{
+		BaseName "png"
+		Type "StaticLibrary"
+		LinkerGroup "AOCC"
+		Group "External/libpng"
+	}
+	%Group Source
+	{
+		%Group Headers
+		{
+			%File png.h
+			%File pngconf.h
+		}
+		%GenerateFile "pnglibconf.h"
+		{
+			Property
+			{
+				Name "@(GeneratedDirectory)pnglibconf.h"
+				Contents "@(ReadFile(@('scripts/pnglibconf.h.prebuilt'->MakeAbsolute())))"
+				Executable false
+				UnixLineEnds true
+				UnicodeBOM false
+			}
+		}
+		%File example.c
+		%File png.c
+		%File pngdebug.h
+		%File pngerror.c
+		%File pngget.c
+		%File pnginfo.h
+		%File pngmem.c
+		%File pngpread.c
+		%File pngpriv.h
+		%File pngread.c
+		%File pngrio.c
+		%File pngrtran.c
+		%File pngrutil.c
+		%File pngset.c
+		%File pngstruct.h
+		%File pngtrans.c
+		%File pngwio.c
+		%File pngwrite.c
+		%File pngwtran.c
+		%File pngwutil.c
+	}
+	%Group "Indirect Dependencies"
+	{
+		Dependency.Indirect true
+		%Dependency Lib_zlib
+	}
+}
