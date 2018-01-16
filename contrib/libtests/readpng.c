@@ -108,8 +108,9 @@ read_png(FILE *fp)
 }
 
 int
-main(void)
+main(int argc, char **argv)
 {
    /* Exit code 0 on success. */
-   return !read_png(stdin);
+   FILE *fp = fopen(argv[1], "r");
+   return !read_png(fp);
 }
