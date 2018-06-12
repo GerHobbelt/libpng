@@ -42,6 +42,8 @@ pnglibconf.h
 *.pidb
 *.svclog
 *.scc
+*.VC.opendb
+*.vc.db
 
 # Visual Studio output directories
 Debug*/
