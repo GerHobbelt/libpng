@@ -10,7 +10,7 @@ nuget
    nuspec
    {
       id = libpng-tsc-package;
-      version: 1.6.18.4;
+      version: 1.6.18.5;
       title: libpng;
       authors: { TechSmith Corporation };
       owners: { TechSmith Corporation };
@@ -30,7 +30,7 @@ nuget
    {
       packages:
       {
-         zlib.v140.windesktop.msvcstl.static.rt-dyn/1.2.8.8;
+         zlib-tsc-package/1.2.11.1;
       };
    };
 
