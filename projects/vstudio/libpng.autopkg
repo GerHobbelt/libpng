@@ -19,8 +19,9 @@ nuget
       iconUrl: "http://www.libpng.org/pub/png/img_png/pnglogo-blk.jpg";
       requireLicenseAcceptance: false;
       summary: libpng recompiled from source;
-      description: @"Portable Network Graphics support.  Compiled with Visual Studio 2015 as a static library.
+      description: @"Portable Network Graphics support.  Compiled with Visual Studio 2017 as a static library.
          New features:
+            v1.6.18.6: Updated to Visual Studio 2017
          Breaking Changes:"
       copyright: "";
       tags: { native, third-party, vs2017, open source, cpp, static, dynamiccpp };
