@@ -1,7 +1,7 @@
 configurations {
    Toolset {
       key : "PlatformToolset";
-      choices: { v140 };
+      choices: { v141 };
    };
 }
 
@@ -10,7 +10,7 @@ nuget
    nuspec
    {
       id = libpng-tsc-package;
-      version: 1.6.18.5;
+      version: 1.6.18.6;
       title: libpng;
       authors: { TechSmith Corporation };
       owners: { TechSmith Corporation };
@@ -19,18 +19,19 @@ nuget
       iconUrl: "http://www.libpng.org/pub/png/img_png/pnglogo-blk.jpg";
       requireLicenseAcceptance: false;
       summary: libpng recompiled from source;
-      description: @"Portable Network Graphics support.  Compiled with Visual Studio 2015 as a static library.
+      description: @"Portable Network Graphics support.  Compiled with Visual Studio 2017 as a static library.
          New features:
+            v1.6.18.6: Updated to Visual Studio 2017
          Breaking Changes:"
       copyright: "";
-      tags: { native, third-party, vs2015, open source, cpp, static, dynamiccpp };
+      tags: { native, third-party, vs2017, open source, cpp, static, dynamiccpp };
    };
 
    dependencies
    {
       packages:
       {
-         zlib-tsc-package/1.2.11.1;
+         zlib-tsc-package/1.2.11.2;
       };
    };
 
@@ -45,7 +46,7 @@ nuget
       };
       vcpdb:          { #destination = ${d_lib}; };
 
-      ("Win32,x64", "v140", "Debug,Release") =>
+      ("Win32,x64", "v141", "Debug,Release") =>
       {
          [${0},${1},${2}]
          {
