@@ -557,7 +557,11 @@
 /* Memory model/platform independent fns */
 #ifndef PNG_ABORT
 #  ifdef _WINDOWS_
-#    define PNG_ABORT() ExitProcess(0)
+#    if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+#      define PNG_ABORT() ExitProcess(0)
+#    else
+#      define PNG_ABORT() _exit(0)
+#    endif
 #  else
 #    define PNG_ABORT() abort()
 #  endif
