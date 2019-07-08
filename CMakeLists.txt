@@ -17,7 +17,14 @@
 
 cmake_minimum_required(VERSION 3.14)
 
+<<<<<<< HEAD
 # Don't complain about endif() etc mismatches
+=======
+# ALIAS for imported target (see 'cmake/Config.cmake.in'):
+# - https://cmake.org/cmake/help/latest/release/3.11.html#other
+cmake_minimum_required(VERSION 3.11)
+cmake_policy(VERSION 3.1)
+>>>>>>> 972ee612a (CMake 3.11 required)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 include("cmake/HunterGate.cmake")
@@ -108,8 +115,7 @@ else()
 endif()
 message(STATUS "Building for target architecture: ${PNG_TARGET_ARCHITECTURE}")
 
-if(${CMAKE_MAJOR_VERSION} GREATER 3 OR
-    (${CMAKE_MAJOR_VERSION} EQUAL 3 AND ${CMAKE_MINOR_VERSION} GREATER_EQUAL 12))
+if(NOT CMAKE_VERSION VERSION_LESS 3.12)
   # For CMake >= 3.12, find_package(<PackageName>) searches prefixes given by
   # <PackageName>_ROOT CMake variable and <PackageName>_ROOT
   # environment variable.
