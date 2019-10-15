@@ -109,6 +109,7 @@ endif()
 # Allow the users to switch on/off the use of hardware (SIMD) optimized code.
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 option(PNG_DISABLE_FILEGEN "Disable dynamic generation of config files" OFF)
+option(PNG_DISABLE_STATIC_DEPENDENCIES        "Disable static dependencies" OFF)
 
 # Initialize and show the target architecture variable PNG_TARGET_ARCHITECTURE.
 #
@@ -723,8 +724,10 @@ if(PNG_STATIC)
   target_include_directories(png_static
                              SYSTEM
                              INTERFACE "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>")
-  target_link_libraries(png_static
+  if(NOT PNG_DISABLE_STATIC_DEPENDENCIES)
+    target_link_libraries(png_static
                         PUBLIC ${PNG_LINK_LIBRARIES})
+  endif()
 endif()
 
 if(PNG_FRAMEWORK AND NOT APPLE)
