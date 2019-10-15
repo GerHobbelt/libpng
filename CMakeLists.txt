@@ -74,6 +74,7 @@ option(PNG_TESTS "Build libpng tests" ON)
 option(PNG_DEBUG "Enable debug output" OFF)
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 option(PNG_DISABLE_FILEGEN "Disable dynamic generation of config files" OFF)
+option(PNG_DISABLE_STATIC_DEPENDENCIES        "Disable static dependencies" OFF)
 
 # Allow the users to specify a location of zlib.
 # Useful if zlib is being built alongside this as a sub-project.
@@ -675,7 +676,9 @@ if(PNG_STATIC)
   set_target_properties(png_static PROPERTIES
                         OUTPUT_NAME "${PNG_STATIC_OUTPUT_NAME}"
                         DEBUG_POSTFIX "${PNG_DEBUG_POSTFIX}")
-  target_link_libraries(png_static ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  if(NOT PNG_DISABLE_STATIC_DEPENDENCIES)
+    target_link_libraries(png_static ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  endif()
 endif()
 
 if(PNG_FRAMEWORK)
