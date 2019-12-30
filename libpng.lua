@@ -37,6 +37,21 @@ project "png"
     "pngwutil.c",
   }
 
+  sse_defines = {
+    "PNG_INTEL_SSE",
+  }
+
+  sse_files = {
+    "intel/filter_sse2_intrinsics.c",
+    "intel/intel_init.c",
+  }
+
+  neon_files = {
+    "arm/arm_init.c",
+    "arm/palette_neon_intrinsics.c",
+    "arm/filter_neon_intrinsics.c",
+  }
+
   includedirs {
     "libpng",
     "../zlib",
@@ -57,7 +72,11 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "windows" }
+    configuration { "windows" }
+
+      defines { sse_defines }
+
+      files { sse_files }
 
     -- -------------------------------------------------------------
     -- configuration { "windows", "Debug", "x32" }
@@ -121,7 +140,11 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "linux" }
+    configuration { "linux" }
+
+      defines { sse_defines }
+
+      files { sse_files }
 
     -- -------------------------------------------------------------
     -- configuration { "linux", "Debug", "x64" }
@@ -161,7 +184,11 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "macosx" }
+    configuration { "macosx" }
+
+      defines { sse_defines }
+
+      files { sse_files }
 
     -- -------------------------------------------------------------
     -- configuration { "macosx", "Debug", "x64" }
@@ -206,7 +233,6 @@ project "png"
       defines {
         "_REENTRANT",
         "NATIVECOMPILE",
-        "PNG_ARM_NEON_OPT=0",
       }
 
     -- -------------------------------------------------------------
@@ -219,7 +245,9 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "ios_arm64_debug" }
+    configuration { "ios_arm64_debug" }
+
+      files { neon_files }
 
     -- -------------------------------------------------------------
     -- configuration { "ios_arm64_release" }
@@ -231,7 +259,9 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "ios_arm64_release" }
+    configuration { "ios_arm64_release" }
+
+      files { neon_files }
 
     -- -------------------------------------------------------------
     -- configuration { "ios_sim64_debug" }
@@ -243,7 +273,11 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "ios_sim64_debug" }
+    configuration { "ios_sim64_debug" }
+
+      defines { sse_defines }
+
+      files { sse_files }
 
     -- -------------------------------------------------------------
     -- configuration { "ios_sim64_release" }
@@ -255,7 +289,11 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "ios_sim64_release" }
+    configuration { "ios_sim64_release" }
+
+      defines { sse_defines }
+
+      files { sse_files }
 
     -- -------------------------------------------------------------
   end
@@ -275,7 +313,6 @@ project "png"
 
       defines {
         "HAVE_MEMMOVE",
-        "PNG_ARM_NEON_OPT=0",
       }
 
     -- -------------------------------------------------------------
@@ -288,7 +325,9 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "android_armv7_debug" }
+    configuration { "android_armv7_debug" }
+
+      files { neon_files }
 
     -- -------------------------------------------------------------
     -- configuration { "android_armv7_release" }
@@ -300,7 +339,9 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "android_armv7_release" }
+    configuration { "android_armv7_release" }
+
+      files { neon_files }
 
     -- -------------------------------------------------------------
     -- configuration { "android_x86_debug" }
@@ -312,7 +353,11 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "android_x86_debug" }
+    configuration { "android_x86_debug" }
+
+      defines { sse_defines }
+
+      files { sse_files }
 
     -- -------------------------------------------------------------
     -- configuration { "android_x86_release" }
@@ -324,7 +369,11 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "android_x86_release" }
+    configuration { "android_x86_release" }
+
+      defines { sse_defines }
+
+      files { sse_files }
 
     -- -------------------------------------------------------------
     -- configuration { "android_arm64_debug" }
@@ -336,7 +385,9 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "android_arm64_debug" }
+    configuration { "android_arm64_debug" }
+
+      files { neon_files }
 
     -- -------------------------------------------------------------
     -- configuration { "android_arm64_release" }
@@ -348,7 +399,9 @@ project "png"
 
     -- project specific configuration settings
 
-    -- configuration { "android_arm64_release" }
+    configuration { "android_arm64_release" }
+
+      files { neon_files }
 
     -- -------------------------------------------------------------
   end
@@ -368,7 +421,7 @@ project "png"
 
       defines {
         "_CRT_SECURE_NO_WARNINGS",
-        "PNG_ARM_NEON_OPT=0",
+        "PNG_ARM_NEON_OPT=0", -- WinUWP doesn't support conditional files or neon
       }
 
     -- -------------------------------------------------------------
