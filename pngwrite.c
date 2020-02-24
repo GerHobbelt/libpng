@@ -75,7 +75,7 @@ write_unknown_chunks(png_structrp png_ptr, png_const_inforp info_ptr,
  * library.  If you have a new chunk to add, make a function to write it,
  * and put it in the correct location here.  If you want the chunk written
  * after the image data, put it in png_write_end().  I strongly encourage
- * you to supply a PNG_INFO_ flag, and check info_ptr->valid before writing
+ * you to supply a PNG_INFO_<chunk> flag, and check info_ptr->valid before writing
  * the chunk, as that will keep the code from breaking if you want to just
  * write a plain PNG file.  If you have long comments, I suggest writing
  * them in png_write_end(), and compressing them.
@@ -128,6 +128,10 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
        * the application continues writing the PNG.  So check the 'invalid'
        * flag here too.
        */
+#ifdef PNG_WRITE_APNG_SUPPORTED
+      if (info_ptr->valid & PNG_INFO_acTL)
+         png_write_acTL(png_ptr, info_ptr->num_frames, info_ptr->num_plays);
+#endif
 #ifdef PNG_GAMMA_SUPPORTED
 #  ifdef PNG_WRITE_gAMA_SUPPORTED
       if ((info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) == 0 &&
@@ -368,6 +372,11 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
    if (png_ptr->num_palette_max > png_ptr->num_palette)
       png_benign_error(png_ptr, "Wrote palette index exceeding num_palette");
+#endif
+
+#ifdef PNG_WRITE_APNG_SUPPORTED
+   if (png_ptr->num_frames_written != png_ptr->num_frames_to_write)
+      png_error(png_ptr, "Not enough frames written");
 #endif
 
    /* See if user wants us to write information chunks */
@@ -1184,6 +1193,17 @@ png_set_compression_strategy(png_structrp png_ptr, int strategy)
    if (png_ptr == NULL)
       return;
 
+   if(strategy > 4)
+   {
+      png_warning(png_ptr, "Only compression strategy<=4 is supported by zlib");
+      strategy = 4;
+   }
+   else if(strategy < 0)
+   {
+      png_warning(png_ptr, "Only compression strategy>=0 is supported by zlib");
+      strategy = 0;
+   }
+
    /* The flag setting here prevents the libpng dynamic selection of strategy.
     */
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
@@ -1200,7 +1220,7 @@ png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
       return;
 
    /* Prior to 1.6.0 this would warn but then set the window_bits value. This
-    * meant that negative window bits values could be selected that would cause
+    * * meant that negative window_bits values could be selected that would cause
     * libpng to write a non-standard PNG file with raw deflate or gzip
     * compressed IDAT or ancillary chunks.  Such files can be read and there is
     * no warning on read, so this seems like a very bad idea.
@@ -1247,6 +1267,17 @@ png_set_text_compression_level(png_structrp png_ptr, int level)
 
    if (png_ptr == NULL)
       return;
+
+   if(level > 9)
+   {
+      png_warning(png_ptr, "Only compression level <= 9 supported by PNG");
+      level = 9;
+   }
+   else if(level < -1)
+   {
+      png_warning(png_ptr, "Only compression level >= -1 supported by PNG");
+      level = -1;
+   }
 
    png_ptr->zlib_text_level = level;
 }
@@ -1461,6 +1492,43 @@ png_write_png(png_structrp png_ptr, png_inforp info_ptr,
 }
 #endif
 
+#ifdef PNG_WRITE_APNG_SUPPORTED
+void PNGAPI
+png_write_frame_head(png_structp png_ptr, png_infop info_ptr,
+    png_bytepp row_pointers, png_uint_32 width, png_uint_32 height,
+    png_uint_32 x_offset, png_uint_32 y_offset,
+    png_uint_16 delay_num, png_uint_16 delay_den, png_byte dispose_op,
+    png_byte blend_op)
+{
+    png_debug(1, "in png_write_frame_head");
+
+    /* there is a chance this has been set after png_write_info was called,
+    * so it would be set but not written. is there a way to be sure? */
+    if (!(info_ptr->valid & PNG_INFO_acTL))
+        png_error(png_ptr, "png_write_frame_head(): acTL not set");
+
+    png_write_reset(png_ptr);
+
+    png_write_reinit(png_ptr, info_ptr, width, height);
+
+    if ( !(png_ptr->num_frames_written == 0 &&
+           (png_ptr->apng_flags & PNG_FIRST_FRAME_HIDDEN) ) )
+        png_write_fcTL(png_ptr, width, height, x_offset, y_offset,
+                       delay_num, delay_den, dispose_op, blend_op);
+
+    PNG_UNUSED(row_pointers)
+}
+
+void PNGAPI
+png_write_frame_tail(png_structp png_ptr, png_infop info_ptr)
+{
+    png_debug(1, "in png_write_frame_tail");
+
+    png_ptr->num_frames_written++;
+
+    PNG_UNUSED(info_ptr)
+}
+#endif /* PNG_WRITE_APNG_SUPPORTED */
 
 #ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
 /* Initialize the write structure - general purpose utility. */
