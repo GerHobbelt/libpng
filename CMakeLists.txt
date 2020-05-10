@@ -1,6 +1,6 @@
 # CMakeLists.txt
 
-# Copyright (c) 2018-2019 Cosmin Truta
+# Copyright (c) 2018-2020 Cosmin Truta
 # Copyright (c) 2007,2009-2018 Glenn Randers-Pehrson
 # Written by Christian Ehrlicher, 2007
 # Revised by Roger Lowman, 2009-2010
@@ -13,6 +13,7 @@
 # Revised by Cameron Cawley, 2018
 # Revised by Cosmin Truta, 2018
 # Revised by Kyle Bentley, 2018
+# Revised by David Callu, 2020
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
