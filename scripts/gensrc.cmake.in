@@ -25,7 +25,7 @@ if("${OUTPUT}" STREQUAL "scripts/pnglibconf.c")
   execute_process(COMMAND "${CMAKE_COMMAND}" -E echo "com ${PNGLIB_VERSION} STANDARD API DEFINITION"
                   COMMAND "${AWK}" -f "${SRCDIR}/scripts/options.awk"
                           "out=pnglibconf.tf6" "logunsupported=1" "version=search"
-                          "${SRCDIR}/pngconf.h" "-"
+                          "${SRCDIR}/include/pngconf.h" "-"
                           "${SRCDIR}/scripts/pnglibconf.dfa"
                   WORKING_DIRECTORY "${BINDIR}"
                   RESULT_VARIABLE AWK_FAIL)
@@ -52,7 +52,7 @@ elseif ("${OUTPUT}" STREQUAL "pnglibconf.c")
 
   execute_process(COMMAND "${AWK}" -f "${SRCDIR}/scripts/options.awk"
                   out=pnglibconf.tf4 version=search
-                  ${SRCDIR}/pngconf.h ${SRCDIR}/scripts/pnglibconf.dfa
+                  ${SRCDIR}/include/pngconf.h ${SRCDIR}/scripts/pnglibconf.dfa
                   ${SRCDIR}/pngusr.dfa ${DFA_XTRA}
                   WORKING_DIRECTORY "${BINDIR}"
                   RESULT_VARIABLE AWK_FAIL)
@@ -72,7 +72,7 @@ elseif ("${OUTPUT}" STREQUAL "pnglibconf.c")
   file(MAKE_DIRECTORY "${BINDIR}/scripts")
   file(RENAME "pnglibconf.tf5" "${BINDIR}/pnglibconf.c")
 
-elseif ("${OUTPUT}" STREQUAL "pnglibconf.h")
+elseif ("${OUTPUT}" STREQUAL "include/pnglibconf.h")
   # Generate pnglibconf.h
 
   file(REMOVE "${BINDIR}/${OUTPUT}")

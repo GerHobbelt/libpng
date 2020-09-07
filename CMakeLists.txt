@@ -18,8 +18,8 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-cmake_minimum_required(VERSION 3.1)
-cmake_policy(VERSION 3.1)
+cmake_minimum_required(VERSION 3.13)
+cmake_policy(VERSION 3.13)
 
 project(libpng C ASM)
 enable_testing()
@@ -36,7 +36,7 @@ include(GNUInstallDirs)
 
 # Allow users to specify location of Zlib.
 # Useful if zlib is being built alongside this as a sub-project.
-option(PNG_BUILD_ZLIB "Custom zlib Location, else find_package is used" OFF)
+set(PNG_BUILD_ZLIB false CACHE BOOL "Custom zlib Location, else find_package is used")
 
 if(NOT PNG_BUILD_ZLIB)
   find_package(ZLIB REQUIRED)
@@ -53,7 +53,7 @@ endif()
 # COMMAND LINE OPTIONS
 option(PNG_SHARED "Build shared lib" ON)
 option(PNG_STATIC "Build static lib" ON)
-option(PNG_TESTS  "Build libpng tests" ON)
+option(PNG_TESTS "Build libpng tests" ON)
 
 # Many more configuration options could be added here
 option(PNG_FRAMEWORK "Build OS X framework" OFF)
@@ -275,7 +275,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 if(NOT AWK OR ANDROID)
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
-                 ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
+                 ${CMAKE_CURRENT_BINARY_DIR}/include/pnglibconf.h)
   add_custom_target(genfiles) # Dummy
 else()
   include(CMakeParseArguments)
@@ -357,13 +357,13 @@ else()
   generate_source(OUTPUT "scripts/pnglibconf.c"
                   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.dfa"
                           "${CMAKE_CURRENT_SOURCE_DIR}/scripts/options.awk"
-                          "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
+                          "${CMAKE_CURRENT_SOURCE_DIR}/include/pngconf.h")
 
   # Generate pnglibconf.c
   generate_source(OUTPUT "pnglibconf.c"
                   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.dfa"
                           "${CMAKE_CURRENT_SOURCE_DIR}/scripts/options.awk"
-                          "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
+                          "${CMAKE_CURRENT_SOURCE_DIR}/include/pngconf.h")
 
   if(PNG_PREFIX)
     set(PNGLIBCONF_H_EXTRA_DEPENDS
@@ -377,18 +377,18 @@ else()
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out")
 
   # Generate pnglibconf.h
-  generate_source(OUTPUT "pnglibconf.h"
+  generate_source(OUTPUT "include/pnglibconf.h"
                   DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out"
                           ${PNGLIBCONF_H_EXTRA_DEPENDS})
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/intprefix.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out"
-               DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h")
+               DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/include/pnglibconf.h")
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/prefix.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out"
-               DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/png.h"
-                       "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
+               DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/png.h"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/pngconf.h"
                        "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out")
 
   # Generate pngprefix.h
@@ -397,19 +397,19 @@ else()
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/sym.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out"
-               DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h")
+               DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/include/pnglibconf.h")
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/symbols.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
-               DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/png.h"
-                       "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
+               DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/png.h"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/pngconf.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt")
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/vers.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out"
-               DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/png.h"
-                       "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
-                       "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h")
+               DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/png.h"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/include/pngconf.h"
+                       "${CMAKE_CURRENT_BINARY_DIR}/include/pnglibconf.h")
 
   generate_chk(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk"
@@ -441,7 +441,7 @@ else()
     "${CMAKE_CURRENT_BINARY_DIR}/libpng.sym"
     "${CMAKE_CURRENT_BINARY_DIR}/libpng.vers"
     "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.c"
-    "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/include/pnglibconf.h"
     "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out"
     "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h"
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out"
@@ -455,9 +455,9 @@ endif(NOT AWK OR ANDROID)
 
 # OUR SOURCES
 set(libpng_public_hdrs
-  png.h
-  pngconf.h
-  "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h"
+  include/png.h
+  include/pngconf.h
+  "${CMAKE_CURRENT_BINARY_DIR}/include/pnglibconf.h"
 )
 set(libpng_private_hdrs
   pngpriv.h
@@ -530,6 +530,8 @@ if(PNG_SHARED)
   add_library(png SHARED ${libpng_sources})
   set(PNG_LIB_TARGETS png)
   set_target_properties(png PROPERTIES OUTPUT_NAME ${PNG_LIB_NAME})
+  target_include_directories(png PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  add_library(libpng::png ALIAS png)
   add_dependencies(png genfiles)
   if(MSVC)
     # msvc does not append 'lib' - do it here to have consistent name
@@ -553,6 +555,8 @@ if(PNG_STATIC)
   # does not work without changing name
   set(PNG_LIB_NAME_STATIC png_static)
   add_library(png_static STATIC ${libpng_sources})
+  target_include_directories(png_static PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  add_library(libpng::pngstatic ALIAS png_static)
   add_dependencies(png_static genfiles)
   # MSVC doesn't use a different file extension for shared vs. static
   # libs.  We are able to change OUTPUT_NAME to remove the _static
