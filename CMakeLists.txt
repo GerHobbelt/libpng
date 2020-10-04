@@ -504,6 +504,9 @@ set(pngunknown_sources
 set(pngimage_sources
     contrib/libtests/pngimage.c
 )
+set(pngadhoc_sources
+  contrib/libtests/pngadhoc.c
+)
 set(pngfix_sources
     contrib/tools/pngfix.c
 )
@@ -787,6 +790,10 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngimage
                OPTIONS --exhaustive --list-combos --log
                FILES ${PNGSUITE_PNGS})
+
+  add_executable(pngadhoc ${pngadhoc_sources})
+  target_link_libraries(pngadhoc png)
+  png_add_test(NAME pngadhoc COMMAND pngadhoc)
 endif()
 
 if(PNG_SHARED AND PNG_EXECUTABLES)
