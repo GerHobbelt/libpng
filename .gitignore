@@ -1,0 +1,41 @@
+
+# Generated files:
+
+# Editor and file browser turds:
+*~
+.*.swp
+.DS_Store
+\#*\#
+
+# Editor settings:
+.exrc
+.vimrc
+*.xcworkspace
+*.xcuserdatad
+user.make
+guide
+
+# Temporary and build files:
+*.class
+*.jar
+*.o
+*.so
+*.dll
+DerivedData
+
+*.user
+*.ncb
+*.suo
+*.user
+*.filters
+.vs
+bin
+obj
+Browse.VC.*
+Solution.VC.*
+UpgradeLog.htm
+
+scripts/__pycache__
+
+/projects/**/Debug/
+/projects/**/Release/
