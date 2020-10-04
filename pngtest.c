@@ -72,6 +72,7 @@
 #else
 #  include "zlib.h"
 #endif
+#undef verbose
 
 /* Copied from pngpriv.h but only used in error messages below. */
 #ifndef PNG_ZBUF_SIZE
