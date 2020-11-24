@@ -14,7 +14,6 @@ authors = [
 requires = [
     "gcc",
     "cmake",
-    "zlib",
 ]
 
 def commands():
