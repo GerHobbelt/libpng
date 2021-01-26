@@ -23,6 +23,7 @@
 #ifndef PNGPRIV_H
 #define PNGPRIV_H
 
+
 /* Feature Test Macros.  The following are defined here to ensure that correctly
  * implemented libraries reveal the APIs libpng needs to build and hide those
  * that are not needed and potentially damaging to the compilation.
@@ -185,6 +186,8 @@
       /* Use the intrinsics code by default. */
 #     define PNG_ARM_NEON_IMPLEMENTATION 1
 #  endif
+#else /* PNG_ARM_NEON_OPT == 0 */
+#     define PNG_ARM_NEON_IMPLEMENTATION 0
 #endif /* PNG_ARM_NEON_OPT > 0 */
 
 #ifndef PNG_MIPS_MSA_OPT
@@ -192,6 +195,15 @@
 #     define PNG_MIPS_MSA_OPT 2
 #  else
 #     define PNG_MIPS_MSA_OPT 0
+#  endif
+#endif
+
+
+#ifndef PNG_LOONGSON_MMI_OPT
+#  if defined(__loongson_mmi) && defined(_MIPS_ARCH_LOONGSON3A) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#     define PNG_LOONGSON_MMI_OPT 2
+#  else
+#     define PNG_LOONGSON_MMI_OPT 0
 #  endif
 #endif
 
@@ -263,11 +275,35 @@
 #  ifndef PNG_MIPS_MSA_IMPLEMENTATION
 #     define PNG_MIPS_MSA_IMPLEMENTATION 1
 #  endif
+#else
+#  define PNG_MIPS_MSA_IMPLEMENTATION 0
 #endif /* PNG_MIPS_MSA_OPT > 0 */
+
+#if PNG_LOONGSON_MMI_OPT > 0
+#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_mmi
+#  ifndef PNG_LOONGSON_MMI_IMPLEMENTATION
+#     if defined(__loongson_mmi)
+#        if defined(__clang__)
+#        elif defined(__GNUC__)
+#           if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7)
+#              define PNG_LOONGSON_MMI_IMPLEMENTATION 2
+#           endif /* no GNUC support */
+#        endif /* __GNUC__ */
+#     else /* !defined __loongson_mmi */
+#        define PNG_LOONGSON_MMI_IMPLEMENTATION 2
+#     endif /* __loongson_mmi */
+#  endif /* !PNG_LOONGSON_MMI_IMPLEMENTATION */
+
+#  ifndef PNG_LOONGSON_MMI_IMPLEMENTATION
+#     define PNG_LOONGSON_MMI_IMPLEMENTATION 1
+#  endif
+#endif /* PNG_LOONGSON_MMI_OPT > 0 */
 
 #if PNG_POWERPC_VSX_OPT > 0
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_vsx
 #  define PNG_POWERPC_VSX_IMPLEMENTATION 1
+#else
+#  define PNG_POWERPC_VSX_IMPLEMENTATION 0
 #endif
 
 
@@ -637,6 +673,10 @@
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000U /* Have another chunk after IDAT */
                    /*             0x4000U (unused) */
 #define PNG_IS_READ_STRUCT        0x8000U /* Else is a write struct */
+#ifdef PNG_APNG_SUPPORTED
+#define PNG_HAVE_acTL            0x10000U
+#define PNG_HAVE_fcTL            0x20000U
+#endif
 
 /* Flags for the transformations the PNG library does on the image data */
 #define PNG_BGR                 0x0001U
@@ -872,6 +912,16 @@
 #define png_tIME PNG_U32(116,  73,  77,  69)
 #define png_tRNS PNG_U32(116,  82,  78,  83)
 #define png_zTXt PNG_U32(122,  84,  88, 116)
+
+#ifdef PNG_APNG_SUPPORTED
+#define png_acTL PNG_U32( 97,  99,  84,  76)
+#define png_fcTL PNG_U32(102,  99,  84,  76)
+#define png_fdAT PNG_U32(102, 100,  65,  84)
+
+/* For png_struct.apng_flags: */
+#define PNG_FIRST_FRAME_HIDDEN       0x0001U
+#define PNG_APNG_APP                 0x0002U
+#endif
 
 /* The following will work on (signed char*) strings, whereas the get_uint_32
  * macro will fail on top-bit-set values because of the sign extension.
@@ -1332,6 +1382,27 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_msa,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
 
+#if PNG_LOONGSON_MMI_OPT > 0
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_mmi,(png_row_infop row_info,
+    png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_mmi,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_mmi,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub6_mmi,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub8_mmi,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_mmi,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_mmi,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_mmi,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_mmi,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+#endif
+
 #if PNG_POWERPC_VSX_OPT > 0
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_vsx,(png_row_infop row_info,
     png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
@@ -1643,6 +1714,47 @@ PNG_INTERNAL_FUNCTION(void,png_colorspace_sync,(png_const_structrp png_ptr,
     * synchronize the flags.  Checks for NULL info_ptr and does nothing.
     */
 #endif
+
+#ifdef PNG_APNG_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_ensure_fcTL_is_valid,(png_structp png_ptr,
+   png_uint_32 width, png_uint_32 height,
+   png_uint_32 x_offset, png_uint_32 y_offset,
+   png_uint_16 delay_num, png_uint_16 delay_den,
+   png_byte dispose_op, png_byte blend_op), PNG_EMPTY);
+
+#ifdef PNG_READ_APNG_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_handle_acTL,(png_structp png_ptr, png_infop info_ptr,
+   png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_handle_fcTL,(png_structp png_ptr, png_infop info_ptr,
+   png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_handle_fdAT,(png_structp png_ptr, png_infop info_ptr,
+   png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_have_info,(png_structp png_ptr, png_infop info_ptr),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_ensure_sequence_number,(png_structp png_ptr,
+   png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_reset,(png_structp png_ptr),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_reinit,(png_structp png_ptr,
+   png_infop info_ptr),PNG_EMPTY);
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_progressive_read_reset,(png_structp png_ptr),PNG_EMPTY);
+#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+#endif /* PNG_READ_APNG_SUPPORTED */
+
+#ifdef PNG_WRITE_APNG_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_write_acTL,(png_structp png_ptr,
+   png_uint_32 num_frames, png_uint_32 num_plays),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_fcTL,(png_structp png_ptr,
+   png_uint_32 width, png_uint_32 height,
+   png_uint_32 x_offset, png_uint_32 y_offset,
+   png_uint_16 delay_num, png_uint_16 delay_den,
+   png_byte dispose_op, png_byte blend_op),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_fdAT,(png_structp png_ptr,
+   png_const_bytep data, png_size_t length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_reset,(png_structp png_ptr),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_reinit,(png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 width, png_uint_32 height),PNG_EMPTY);
+#endif /* PNG_WRITE_APNG_SUPPORTED */
+#endif /* PNG_APNG_SUPPORTED */
 
 /* Added at libpng version 1.4.0 */
 #ifdef PNG_COLORSPACE_SUPPORTED
@@ -2105,6 +2217,11 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
 
 #if PNG_MIPS_MSA_OPT > 0
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_msa,
+   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+#endif
+
+#if PNG_LOONGSON_MMI_OPT > 0
+PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_mmi,
    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
 
