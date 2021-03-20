@@ -15,6 +15,46 @@
 user.make
 guide
 
+# Prerequisites
+*.d
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Linker output files
+*.exp
+*.ilk
+*.map
+
+# Compiled dynamic libraries
+*.dll
+*.dylib
+*.so
+*.so.*
+
+# Compiled static libraries
+*.a
+*.la
+*.lai
+*.lib
+
+# Compiled executables
+*.app/
+*.exe
+
+# Debug files
+*.dSYM/
+*.idb
+*.pdb
+*.su
+
 # Temporary and build files:
 *.class
 *.jar
