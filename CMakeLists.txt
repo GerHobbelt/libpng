@@ -67,9 +67,15 @@ set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
 
 if(PNG_HARDWARE_OPTIMIZATIONS)
 
+# add the system processor to CMAKE_OSX_ARCHITECTURES if it hasn't been specified
+if("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "")
+  list(APPEND CMAKE_OSX_ARCHITECTURES ${CMAKE_SYSTEM_PROCESSOR})
+endif()
+
 # Set definitions and sources for ARM.
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
-  CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+  CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64" OR
+  "arm64" IN_LIST CMAKE_OSX_ARCHITECTURES)
   set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
   set(PNG_ARM_NEON "check"
       CACHE STRING "Enable ARM NEON optimizations: check|on|off; check is default")
@@ -167,7 +173,8 @@ else(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64" OR
+   "arm64" IN_LIST CMAKE_OSX_ARCHITECTURES)
   add_definitions(-DPNG_ARM_NEON_OPT=0)
 endif()
 
