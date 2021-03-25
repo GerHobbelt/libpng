@@ -87,12 +87,6 @@ if (_PLATFORM_COCOA) then
   defines { sse_defines }
 
   files { sse_files }
-
-  configuration { "*sim64*" } -- remove once sim64 is simx64
-
-  defines { sse_defines }
-
-  files { sse_files }
 end
 
 if (_PLATFORM_IOS) then
@@ -106,12 +100,6 @@ if (_PLATFORM_IOS) then
   files { neon_files }
 
   configuration { "*x64*" }
-
-  defines { sse_defines }
-
-  files { sse_files }
-
-  configuration { "*sim64*" } -- remove once sim64 is simx64
 
   defines { sse_defines }
 
