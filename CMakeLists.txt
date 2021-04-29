@@ -271,6 +271,11 @@ if(UNIX)
 endif()
 
 find_program(AWK NAMES gawk awk)
+if(WIN32)
+  set(AWK NO) # fix build issues when building with MSVC and bash (for me, with VSCode)
+  # See https://stackoverflow.com/questions/66463899/libpng-with-directory-tree-zlib-build-error
+  # for more info
+endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
