@@ -155,7 +155,7 @@ png_read_sig(png_structrp png_ptr, png_inforp info_ptr)
 png_uint_32 /* PRIVATE */
 png_read_chunk_header(png_structrp png_ptr)
 {
-   png_byte buf[8];
+   png_byte buf[8] = {};
    png_uint_32 length;
 
 #ifdef PNG_IO_STATE_SUPPORTED
