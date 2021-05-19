@@ -711,6 +711,26 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/genout.cmake.in
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/gensrc.cmake.in
                ${CMAKE_CURRENT_BINARY_DIR}/scripts/gensrc.cmake @ONLY)
 
+
+# CREATE PKGCONFIG FILES
+# We use the same files like ./configure, so we have to set its vars.
+# Only do this on Windows for Cygwin - the files don't make much sense outside
+# of a UNIX look-alike.
+if(NOT WIN32 OR CYGWIN OR MINGW)
+  set(prefix      ${CMAKE_INSTALL_PREFIX})
+  set(exec_prefix ${CMAKE_INSTALL_PREFIX})
+  set(libdir      ${CMAKE_INSTALL_FULL_LIBDIR})
+  set(includedir  ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+  set(LIBS        "-lz -lm")
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
+          ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc @ONLY)
+  create_symlink(libpng.pc FILE ${PNGLIB_NAME}.pc)
+
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
+          ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config @ONLY)
+  create_symlink(libpng-config FILE ${PNGLIB_NAME}-config)
+endif()
+
 ####
 # Installation (https://github.com/forexample/package-example)
 
