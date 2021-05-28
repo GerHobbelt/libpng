@@ -64,6 +64,12 @@
 #  define PNG_RESTRICT restrict
 #endif
 
+#include "zlib-ng.h"
+
+#ifndef ZLIB_VERNUM
+#define ZLIB_VERNUM 0x2100
+#endif
+
 /* To support symbol prefixing it is necessary to know *before* including png.h
  * whether the fixed point (and maybe other) APIs are exported, because if they
  * are not internal definitions may be required.  This is handled below just
@@ -1466,7 +1472,7 @@ PNG_INTERNAL_FUNCTION(int,png_zlib_inflate,(png_structrp png_ptr, int flush),
       PNG_EMPTY);
 #  define PNG_INFLATE(pp, flush) png_zlib_inflate(pp, flush)
 #else /* Zlib < 1.2.4 */
-#  define PNG_INFLATE(pp, flush) inflate(&(pp)->zstream, flush)
+#  define PNG_INFLATE(pp, flush) zng_inflate(&(pp)->zstream, flush)
 #endif /* Zlib < 1.2.4 */
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED

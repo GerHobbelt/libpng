@@ -23,15 +23,7 @@
  * in this structure and is required for decompressing the LZ compressed
  * data in PNG files.
  */
-#ifndef ZLIB_CONST
-   /* We must ensure that zlib uses 'const' in declarations. */
-#  define ZLIB_CONST
-#endif
-#include "zlib.h"
-#ifdef const
-   /* zlib.h sometimes #defines const to nothing, undo this. */
-#  undef const
-#endif
+#include "zlib-ng.h"
 
 /* zlib.h has mediocre z_const use before 1.2.6, this stuff is for compatibility
  * with older builds.
@@ -180,7 +172,7 @@ struct png_struct_def
    png_uint_32 transformations; /* which transformations to perform */
 
    png_uint_32 zowner;        /* ID (chunk type) of zstream owner, 0 if none */
-   z_stream    zstream;       /* decompression structure */
+   zng_stream    zstream;       /* decompression structure */
 
 #ifdef PNG_WRITE_SUPPORTED
    png_compression_bufferp zbuffer_list; /* Created on demand during write */
