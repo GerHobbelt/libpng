@@ -166,6 +166,21 @@
  * been distributed and maintained world-wide, continually since 1995,
  * the Copyright owners claim "common-law trademark protection" in any
  * jurisdiction where common-law trademark is recognized.
+ *
+ * OSI CERTIFICATION:
+ *
+ * Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is
+ * a certification mark of the Open Source Initiative. OSI has not addressed
+ * the additional disclaimers inserted at version 1.0.7.
+ *
+ * EXPORT CONTROL:
+ *
+ * The Copyright owner believes that the Export Control Classification
+ * Number (ECCN) for libpng is EAR99, which means not subject to export
+ * controls or International Traffic in Arms Regulations (ITAR) because
+ * it is open source, publicly available software, that does not contain
+ * any encryption software.  See the EAR, paragraphs 734.3(b)(3) and
+ * 734.7(b).
  */
 
 /*
@@ -261,6 +276,63 @@
  * See libpng.txt or libpng.3 for more information.  The PNG specification
  * is available as a W3C Recommendation and as an ISO/IEC Standard; see
  * <https://www.w3.org/TR/2003/REC-PNG-20031110/>
+ */
+
+/*
+ * Y2K compliance in libpng:
+ * =========================
+ *
+ *    September 29, 2017
+ *
+ *    Since the PNG Development group is an ad-hoc body, we can't make
+ *    an official declaration.
+ *
+ *    This is your unofficial assurance that libpng from version 0.71 and
+ *    upward through 1.6.34 are Y2K compliant.  It is my belief that
+ *    earlier versions were also Y2K compliant.
+ *
+ *    Libpng only has two year fields.  One is a 2-byte unsigned integer
+ *    that will hold years up to 65535.  The other, which is deprecated,
+ *    holds the date in text format, and will hold years up to 9999.
+ *
+ *    The integer is
+ *        "png_uint_16 year" in png_time_struct.
+ *
+ *    The string is
+ *        "char time_buffer[29]" in png_struct.  This is no longer used
+ *    in libpng-1.6.x and will be removed from libpng-1.7.0.
+ *
+ *    There are seven time-related functions:
+ *        png.c: png_convert_to_rfc_1123_buffer() in png.c
+ *          (formerly png_convert_to_rfc_1123() prior to libpng-1.5.x and
+ *          png_convert_to_rfc_1152() in error prior to libpng-0.98)
+ *        png_convert_from_struct_tm() in pngwrite.c, called in pngwrite.c
+ *        png_convert_from_time_t() in pngwrite.c
+ *        png_get_tIME() in pngget.c
+ *        png_handle_tIME() in pngrutil.c, called in pngread.c
+ *        png_set_tIME() in pngset.c
+ *        png_write_tIME() in pngwutil.c, called in pngwrite.c
+ *
+ *    All handle dates properly in a Y2K environment.  The
+ *    png_convert_from_time_t() function calls gmtime() to convert from system
+ *    clock time, which returns (year - 1900), which we properly convert to
+ *    the full 4-digit year.  There is a possibility that libpng applications
+ *    are not passing 4-digit years into the png_convert_to_rfc_1123_buffer()
+ *    function, or that they are incorrectly passing only a 2-digit year
+ *    instead of "year - 1900" into the png_convert_from_struct_tm() function,
+ *    but this is not under our control.  The libpng documentation has always
+ *    stated that it works with 4-digit years, and the APIs have been
+ *    documented as such.
+ *
+ *    The tIME chunk itself is also Y2K compliant.  It uses a 2-byte unsigned
+ *    integer to hold the year, and can hold years as large as 65535.
+ *
+ *    zlib, upon which libpng depends, is also Y2K compliant.  It contains
+ *    no date-related code.
+ *
+ *       Glenn Randers-Pehrson
+ *       libpng maintainer
+ *       PNG Development Group
  */
 
 #ifndef PNG_H
