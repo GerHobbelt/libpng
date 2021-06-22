@@ -77,3 +77,6 @@ pngout.png
 
 # Libpng CI artifacts
 out/
+# SSE
+_rez_build
+.vscode
