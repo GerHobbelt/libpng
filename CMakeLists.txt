@@ -64,13 +64,36 @@ set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
 
 option(PNG_DISABLE_AWK "Disable AWK based scripts code generation" YES)
 
+if(APPLE)
+  # If IOS is not set, check CMAKE_OSX_ROOT
+  if(NOT IOS)
+    if(CMAKE_OSX_SYSROOT STREQUAL "iphoneos")
+      set(IOS ON)
+    endif()
+  endif()
+endif()
+
+if(IOS AND CMAKE_SYSTEM_PROCESSOR STREQUAL "")
+  # In multi-architecture IOS builds, the CMAKE_SYSTEM_PROCESSOR
+  # field is blank. The PNG_HARDWARE_OPTIMIZATIONS statement below
+  # can't cope with this as such. Disable optimisations and ensure
+  # flags are set properly in the else part below.
+  SET(PNG_HARDWARE_OPTIMIZATIONS OFF)
+endif()
+
 if(PNG_HARDWARE_OPTIMIZATIONS)
 
 # set definitions and sources for arm
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
     CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
   set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
-  set(PNG_ARM_NEON "check" CACHE STRING "Enable ARM NEON optimizations:
+  if(IOS)
+    set(neon_default "off")
+  else()
+    set(neon_default "check")
+  endif()
+  message("****neon_default: ${neon_default}")
+  set(PNG_ARM_NEON "${neon_default}" CACHE STRING "Enable ARM NEON optimizations:
      check: (default) use internal checking code;
      off: disable the optimizations;
      on: turn on unconditionally.")
@@ -171,11 +194,31 @@ endif()
 
 else(PNG_HARDWARE_OPTIMIZATIONS)
 
-# set definitions and sources for arm, powerpc, intel and MIPS
-add_definitions(-DPNG_ARM_NEON_OPT=0)
-add_definitions(-DPNG_POWERPC_VSX_OPT=0)
-add_definitions(-DPNG_INTEL_SSE_OPT=0)
-add_definitions(-DPNG_MIPS_MSA_OPT=0)
+# set definitions and sources for arm
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64" OR
+   IOS)
+  add_definitions(-DPNG_ARM_NEON_OPT=0)
+endif()
+
+# set definitions and sources for powerpc
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^powerpc*" OR
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc64*")
+  add_definitions(-DPNG_POWERPC_VSX_OPT=0)
+endif()
+
+# set definitions and sources for intel
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*" OR
+   IOS)
+  add_definitions(-DPNG_INTEL_SSE_OPT=0)
+endif()
+
+# set definitions and sources for MIPS
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
+   CMAKE_SYSTEM_PROCESSOR MATCHES "mips64el*")
+  add_definitions(-DPNG_MIPS_MSA_OPT=0)
+endif()
 
 endif(PNG_HARDWARE_OPTIMIZATIONS)
 
