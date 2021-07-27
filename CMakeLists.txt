@@ -17,14 +17,7 @@
 
 cmake_minimum_required(VERSION 3.14)
 
-<<<<<<< HEAD
 # Don't complain about endif() etc mismatches
-=======
-# ALIAS for imported target (see 'cmake/Config.cmake.in'):
-# - https://cmake.org/cmake/help/latest/release/3.11.html#other
-cmake_minimum_required(VERSION 3.11)
-cmake_policy(VERSION 3.1)
->>>>>>> 972ee612a (CMake 3.11 required)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 include("cmake/HunterGate.cmake")
@@ -137,6 +130,23 @@ else()
   # libm is not available or not needed.
 endif()
 
+if(APPLE)
+  # If IOS is not set, check CMAKE_OSX_ROOT
+  if(NOT IOS)
+    if(CMAKE_OSX_SYSROOT STREQUAL "iphoneos")
+      set(IOS ON)
+    endif()
+  endif()
+endif()
+
+if(IOS AND CMAKE_SYSTEM_PROCESSOR STREQUAL "")
+  # In multi-architecture IOS builds, the CMAKE_SYSTEM_PROCESSOR
+  # field is blank. The PNG_HARDWARE_OPTIMIZATIONS statement below
+  # can't cope with this as such. Disable optimisations and ensure
+  # flags are set properly in the else part below.
+  SET(PNG_HARDWARE_OPTIMIZATIONS OFF)
+endif()
+
 if(PNG_HARDWARE_OPTIMIZATIONS)
 
   # Set definitions and sources for ARM.
@@ -147,7 +157,13 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
           CACHE STRING "Enable ARM NEON optimizations: on|off; on is default")
     else()
       set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
-      set(PNG_ARM_NEON "off"
+       if(IOS)
+         set(neon_default "off")
+       else()
+         set(neon_default "check")
+       endif()
+       message("****neon_default: ${neon_default}")
+       set(PNG_ARM_NEON "${neon_default}"
           CACHE STRING "Enable ARM NEON optimizations: check|on|off; off is default")
     endif()
     set_property(CACHE PNG_ARM_NEON
