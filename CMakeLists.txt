@@ -719,6 +719,15 @@ set(include_install_dir "include")
 
 set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
+# SET UP LINKS
+if(PNG_SHARED)
+  set_target_properties(png PROPERTIES
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.37
+    VERSION 16.${PNGLIB_RELEASE}.0
+    SOVERSION 16
+    CLEAN_DIRECT_OUTPUT 1)
+endif()
+
 set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
 set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
 set(targets_export_name "${PROJECT_NAME}Targets")
