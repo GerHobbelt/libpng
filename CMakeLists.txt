@@ -58,6 +58,7 @@ option(PNG_TESTS  "Build libpng tests" YES)
 option(PNG_FRAMEWORK "Build OS X framework" OFF)
 option(PNGARG        "Disable ANSI-C prototypes" OFF)
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
+option(PNG_MULTIARCH "Support multiple architectures within the same project" OFF)
 
 set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
 set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
@@ -68,9 +69,14 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
 
 # set definitions and sources for arm
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
-    CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+    CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64" OR
+    PNG_MULTIARCH)
   set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
-  set(PNG_ARM_NEON "check" CACHE STRING "Enable ARM NEON optimizations:
+  set(PNG_ARM_NEON_DEFAULT "check")
+  if (PNG_MULTIARCH)
+    set(PNG_ARM_NEON_DEFAULT "on")
+  endif()
+  set(PNG_ARM_NEON "${PNG_ARM_NEON_DEFAULT}" CACHE STRING "Enable ARM NEON optimizations:
      check: (default) use internal checking code;
      off: disable the optimizations;
      on: turn on unconditionally.")
@@ -99,7 +105,8 @@ endif()
 
 # set definitions and sources for powerpc
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^powerpc*" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc64*")
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc64*" OR
+   PNG_MULTIARCH)
   set(PNG_POWERPC_VSX_POSSIBLE_VALUES on off)
   set(PNG_POWERPC_VSX "on" CACHE STRING "Enable POWERPC VSX optimizations:
      off: disable the optimizations.")
@@ -123,7 +130,8 @@ endif()
 
 # set definitions and sources for intel
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*" OR
+   PNG_MULTIARCH)
   set(PNG_INTEL_SSE_POSSIBLE_VALUES on off)
   set(PNG_INTEL_SSE "on" CACHE STRING "Enable INTEL_SSE optimizations:
      off: disable the optimizations")
@@ -147,7 +155,8 @@ endif()
 
 # set definitions and sources for MIPS
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "mips64el*")
+   CMAKE_SYSTEM_PROCESSOR MATCHES "mips64el*" OR
+   PNG_MULTIARCH)
   set(PNG_MIPS_MSA_POSSIBLE_VALUES on off)
   set(PNG_MIPS_MSA "on" CACHE STRING "Enable MIPS_MSA optimizations:
      off: disable the optimizations")
@@ -167,6 +176,12 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
   else()
     add_definitions(-DPNG_MIPS_MSA_OPT=0)
   endif()
+endif()
+
+if(PNG_MULTIARCH)
+  add_definitions(-DPNG_USER_CONFIG=1)
+
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/multiarch)
 endif()
 
 else(PNG_HARDWARE_OPTIMIZATIONS)
