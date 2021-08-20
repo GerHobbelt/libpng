@@ -15,8 +15,8 @@
 CC = cl
 LD = link
 AR = lib
-CPPFLAGS = -I..\zlib
-CFLAGS  = -nologo -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -MD -O2 -W3
+CPPFLAGS = -I..\zlib-new
+CFLAGS  = -DWINVER=0x500 -D_MBCS -D_WINDOWS -DNDEBUG -DWIN32 -nologo -D_CRT_SECURE_NO_DEPRECATE -MT -W3 -O2 -Oy- -YX -FD -GA -Zi -Fd"libpng"
 LDFLAGS = -nologo
 ARFLAGS = -nologo
 CP = copy
