@@ -1131,3 +1131,6 @@ endif()
 # TODO: Create MSVC import lib for MinGW-compiled shared lib.
 # pexports libpng.dll > libpng.def
 # lib /def:libpng.def /machine:x86
+
+# REZ
+install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/cmake DESTINATION ${CMAKE_INSTALL_PREFIX})
