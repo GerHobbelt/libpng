@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Copyright (c) 2018-2019 Cosmin Truta
+ * Copyright (c) 2018-2020 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_37 Your_png_h_is_not_version_1_6_37;
+typedef png_libpng_version_1_6_38_git Your_png_h_is_not_version_1_6_38_git;
 
 #ifdef __GNUC__
 /* The version tests may need to be added to, but the problem warning has
@@ -127,7 +127,7 @@ void /* PRIVATE */
 png_reset_crc(png_structrp png_ptr)
 {
    /* The cast is safe because the crc is a 32-bit value. */
-   png_ptr->crc = (png_uint_32)crc32(0, Z_NULL, 0);
+   png_ptr->crc = (png_uint_32)zng_crc32(0, Z_NULL, 0);
 }
 
 /* Calculate the CRC over a section of data.  We can only pass as
@@ -170,7 +170,7 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, size_t length)
             safe_length = (uInt)-1; /* evil, but safe */
 #endif
 
-         crc = crc32(crc, ptr, safe_length);
+         crc = zng_crc32(crc, ptr, safe_length);
 
          /* The following should never issue compiler warnings; if they do the
           * target system has characteristics that will probably violate other
@@ -815,8 +815,8 @@ png_get_copyright(png_const_structrp png_ptr)
    return PNG_STRING_COPYRIGHT
 #else
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.37" PNG_STRING_NEWLINE \
-      "Copyright (c) 2018-2019 Cosmin Truta" PNG_STRING_NEWLINE \
+      "libpng version 1.6.38.git" PNG_STRING_NEWLINE \
+      "Copyright (c) 2018-2020 Cosmin Truta" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson" \
       PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
@@ -976,8 +976,8 @@ png_reset_zstream(png_structrp png_ptr)
    if (png_ptr == NULL)
       return Z_STREAM_ERROR;
 
-   /* WARNING: this resets the window bits to the maximum! */
-   return (inflateReset(&png_ptr->zstream));
+   /* WARNING: this resets the window_bits to the maximum! */
+   return (zng_inflateReset(&png_ptr->zstream));
 }
 #endif /* READ */
 
@@ -1843,12 +1843,12 @@ png_icc_profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
 #  ifdef PNG_WARNINGS_SUPPORTED
    else
       {
-         char number[PNG_NUMBER_BUFFER_SIZE]; /* +24 = 114*/
+         char number[PNG_NUMBER_BUFFER_SIZE]; /* +24 = 114 */
 
          pos = png_safecat(message, (sizeof message), pos,
              png_format_number(number, number+(sizeof number),
              PNG_NUMBER_FORMAT_x, value));
-         pos = png_safecat(message, (sizeof message), pos, "h: "); /*+2 = 116*/
+         pos = png_safecat(message, (sizeof message), pos, "h: "); /* +2 = 116 */
       }
 #  endif
    /* The 'reason' is an arbitrary message, allow +79 maximum 195 */
@@ -2359,8 +2359,8 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
             /* Now calculate the adler32 if not done already. */
             if (adler == 0)
             {
-               adler = adler32(0, NULL, 0);
-               adler = adler32(adler, profile, length);
+               adler = zng_adler32(0, NULL, 0);
+               adler = zng_adler32(adler, profile, length);
             }
 
             if (adler == png_sRGB_checks[i].adler)
@@ -2372,8 +2372,8 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
 #              if PNG_sRGB_PROFILE_CHECKS > 1
                   if (crc == 0)
                   {
-                     crc = crc32(0, NULL, 0);
-                     crc = crc32(crc, profile, length);
+                     crc = zng_crc32(0, NULL, 0);
+                     crc = zng_crc32(crc, profile, length);
                   }
 
                   /* So this check must pass for the 'return' below to happen.

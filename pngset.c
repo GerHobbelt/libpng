@@ -288,6 +288,11 @@ png_set_IHDR(png_const_structrp png_ptr, png_inforp info_ptr,
    info_ptr->pixel_depth = (png_byte)(info_ptr->channels * info_ptr->bit_depth);
 
    info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, width);
+
+#ifdef PNG_APNG_SUPPORTED
+   /* for non-animated png. this may be overwritten from an acTL chunk later */
+   info_ptr->num_frames = 1;
+#endif
 }
 
 #ifdef PNG_oFFs_SUPPORTED
@@ -1019,6 +1024,9 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
           info_ptr->trans_alpha = png_voidcast(png_bytep,
               png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
           memcpy(info_ptr->trans_alpha, trans_alpha, (size_t)num_trans);
+
+          info_ptr->valid |= PNG_INFO_tRNS;
+          info_ptr->free_me |= PNG_FREE_TRNS;
        }
        png_ptr->trans_alpha = info_ptr->trans_alpha;
    }
@@ -1157,6 +1165,147 @@ png_set_sPLT(png_const_structrp png_ptr,
       png_chunk_report(png_ptr, "sPLT out of memory", PNG_CHUNK_WRITE_ERROR);
 }
 #endif /* sPLT */
+
+#ifdef PNG_APNG_SUPPORTED
+png_uint_32 PNGAPI
+png_set_acTL(png_structp png_ptr, png_infop info_ptr,
+    png_uint_32 num_frames, png_uint_32 num_plays)
+{
+    png_debug1(1, "in %s storage function", "acTL");
+
+    if (png_ptr == NULL || info_ptr == NULL)
+    {
+        png_warning(png_ptr,
+                    "Call to png_set_acTL() with NULL png_ptr "
+                    "or info_ptr ignored");
+        return (0);
+    }
+    if (num_frames == 0)
+    {
+        png_warning(png_ptr,
+                    "Ignoring attempt to set acTL with num_frames zero");
+        return (0);
+    }
+    if (num_frames > PNG_UINT_31_MAX)
+    {
+        png_warning(png_ptr,
+                    "Ignoring attempt to set acTL with num_frames > 2^31-1");
+        return (0);
+    }
+    if (num_plays > PNG_UINT_31_MAX)
+    {
+        png_warning(png_ptr,
+                    "Ignoring attempt to set acTL with num_plays "
+                    "> 2^31-1");
+        return (0);
+    }
+
+    info_ptr->num_frames = num_frames;
+    info_ptr->num_plays = num_plays;
+
+    info_ptr->valid |= PNG_INFO_acTL;
+
+    return (1);
+}
+
+/* delay_num and delay_den can hold any 16-bit values including zero */
+png_uint_32 PNGAPI
+png_set_next_frame_fcTL(png_structp png_ptr, png_infop info_ptr,
+    png_uint_32 width, png_uint_32 height,
+    png_uint_32 x_offset, png_uint_32 y_offset,
+    png_uint_16 delay_num, png_uint_16 delay_den,
+    png_byte dispose_op, png_byte blend_op)
+{
+    png_debug1(1, "in %s storage function", "fcTL");
+
+    if (png_ptr == NULL || info_ptr == NULL)
+    {
+        png_warning(png_ptr,
+                    "Call to png_set_fcTL() with NULL png_ptr or info_ptr "
+                    "ignored");
+        return (0);
+    }
+
+    png_ensure_fcTL_is_valid(png_ptr, width, height, x_offset, y_offset,
+                             delay_num, delay_den, dispose_op, blend_op);
+
+    if (blend_op == PNG_BLEND_OP_OVER)
+    {
+        if (!(png_ptr->color_type & PNG_COLOR_MASK_ALPHA) &&
+            !(png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)))
+        {
+          png_warning(png_ptr, "PNG_BLEND_OP_OVER is meaningless "
+                               "and wasteful for opaque images, ignored");
+          blend_op = PNG_BLEND_OP_SOURCE;
+        }
+    }
+
+    info_ptr->next_frame_width = width;
+    info_ptr->next_frame_height = height;
+    info_ptr->next_frame_x_offset = x_offset;
+    info_ptr->next_frame_y_offset = y_offset;
+    info_ptr->next_frame_delay_num = delay_num;
+    info_ptr->next_frame_delay_den = delay_den;
+    info_ptr->next_frame_dispose_op = dispose_op;
+    info_ptr->next_frame_blend_op = blend_op;
+
+    info_ptr->valid |= PNG_INFO_fcTL;
+
+    return (1);
+}
+
+void /* PRIVATE */
+png_ensure_fcTL_is_valid(png_structp png_ptr,
+    png_uint_32 width, png_uint_32 height,
+    png_uint_32 x_offset, png_uint_32 y_offset,
+    png_uint_16 delay_num, png_uint_16 delay_den,
+    png_byte dispose_op, png_byte blend_op)
+{
+    if (width == 0 || width > PNG_UINT_31_MAX)
+        png_error(png_ptr, "invalid width in fcTL (> 2^31-1)");
+    if (height == 0 || height > PNG_UINT_31_MAX)
+        png_error(png_ptr, "invalid height in fcTL (> 2^31-1)");
+    if (x_offset > PNG_UINT_31_MAX)
+        png_error(png_ptr, "invalid x_offset in fcTL (> 2^31-1)");
+    if (y_offset > PNG_UINT_31_MAX)
+        png_error(png_ptr, "invalid y_offset in fcTL (> 2^31-1)");
+    if (width + x_offset > png_ptr->first_frame_width ||
+        height + y_offset > png_ptr->first_frame_height)
+        png_error(png_ptr, "dimensions of a frame are greater than"
+                           "the ones in IHDR");
+
+    if (dispose_op != PNG_DISPOSE_OP_NONE &&
+        dispose_op != PNG_DISPOSE_OP_BACKGROUND &&
+        dispose_op != PNG_DISPOSE_OP_PREVIOUS)
+        png_error(png_ptr, "invalid dispose_op in fcTL");
+
+    if (blend_op != PNG_BLEND_OP_SOURCE &&
+        blend_op != PNG_BLEND_OP_OVER)
+        png_error(png_ptr, "invalid blend_op in fcTL");
+
+    PNG_UNUSED(delay_num)
+    PNG_UNUSED(delay_den)
+}
+
+png_uint_32 PNGAPI
+png_set_first_frame_is_hidden(png_structp png_ptr, png_infop info_ptr,
+                              png_byte is_hidden)
+{
+    png_debug(1, "in png_first_frame_is_hidden()");
+
+    if (png_ptr == NULL)
+        return 0;
+
+    if (is_hidden)
+        png_ptr->apng_flags |= PNG_FIRST_FRAME_HIDDEN;
+    else
+        png_ptr->apng_flags &= ~PNG_FIRST_FRAME_HIDDEN;
+
+    PNG_UNUSED(info_ptr)
+
+    return 1;
+}
+#endif /* PNG_APNG_SUPPORTED */
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 static png_byte
@@ -1326,7 +1475,7 @@ png_set_unknown_chunk_location(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
 png_uint_32 PNGAPI
-png_permit_mng_features (png_structrp png_ptr, png_uint_32 mng_features)
+png_permit_mng_features(png_structrp png_ptr, png_uint_32 mng_features)
 {
    png_debug(1, "in png_permit_mng_features");
 
@@ -1460,7 +1609,11 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
    {
       new_list = png_voidcast(png_bytep, png_malloc(png_ptr,
           5 * (num_chunks + old_num_chunks)));
-
+      if (new_list == NULL)
+      {
+          png_warning(png_ptr, "Insufficient memory");
+          return;
+      }
       if (old_num_chunks > 0)
          memcpy(new_list, png_ptr->chunk_list, 5*old_num_chunks);
    }
@@ -1633,7 +1786,7 @@ png_set_invalid(png_const_structrp png_ptr, png_inforp info_ptr, int mask)
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 /* This function was added to libpng 1.2.6 */
 void PNGAPI
-png_set_user_limits (png_structrp png_ptr, png_uint_32 user_width_max,
+png_set_user_limits(png_structrp png_ptr, png_uint_32 user_width_max,
     png_uint_32 user_height_max)
 {
    /* Images with dimensions larger than these limits will be
@@ -1649,7 +1802,7 @@ png_set_user_limits (png_structrp png_ptr, png_uint_32 user_width_max,
 
 /* This function was added to libpng 1.4.0 */
 void PNGAPI
-png_set_chunk_cache_max (png_structrp png_ptr, png_uint_32 user_chunk_cache_max)
+png_set_chunk_cache_max(png_structrp png_ptr, png_uint_32 user_chunk_cache_max)
 {
    if (png_ptr != NULL)
       png_ptr->user_chunk_cache_max = user_chunk_cache_max;
@@ -1657,7 +1810,7 @@ png_set_chunk_cache_max (png_structrp png_ptr, png_uint_32 user_chunk_cache_max)
 
 /* This function was added to libpng 1.4.1 */
 void PNGAPI
-png_set_chunk_malloc_max (png_structrp png_ptr,
+png_set_chunk_malloc_max(png_structrp png_ptr,
     png_alloc_size_t user_chunk_malloc_max)
 {
    if (png_ptr != NULL)

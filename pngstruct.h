@@ -23,15 +23,7 @@
  * in this structure and is required for decompressing the LZ compressed
  * data in PNG files.
  */
-#ifndef ZLIB_CONST
-   /* We must ensure that zlib uses 'const' in declarations. */
-#  define ZLIB_CONST
-#endif
-#include "zlib.h"
-#ifdef const
-   /* zlib.h sometimes #defines const to nothing, undo this. */
-#  undef const
-#endif
+#include "zlib-ng.h"
 
 /* zlib.h has mediocre z_const use before 1.2.6, this stuff is for compatibility
  * with older builds.
@@ -180,7 +172,7 @@ struct png_struct_def
    png_uint_32 transformations; /* which transformations to perform */
 
    png_uint_32 zowner;        /* ID (chunk type) of zstream owner, 0 if none */
-   z_stream    zstream;       /* decompression structure */
+   zng_stream    zstream;       /* decompression structure */
 
 #ifdef PNG_WRITE_SUPPORTED
    png_compression_bufferp zbuffer_list; /* Created on demand during write */
@@ -188,7 +180,7 @@ struct png_struct_def
 
    int zlib_level;            /* holds zlib compression level */
    int zlib_method;           /* holds zlib compression method */
-   int zlib_window_bits;      /* holds zlib compression window bits */
+   int zlib_window_bits;      /* holds zlib compression window_bits */
    int zlib_mem_level;        /* holds zlib compression memory level */
    int zlib_strategy;         /* holds zlib compression strategy */
 #endif
@@ -196,7 +188,7 @@ struct png_struct_def
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
    int zlib_text_level;            /* holds zlib compression level */
    int zlib_text_method;           /* holds zlib compression method */
-   int zlib_text_window_bits;      /* holds zlib compression window bits */
+   int zlib_text_window_bits;      /* holds zlib compression window_bits */
    int zlib_text_mem_level;        /* holds zlib compression memory level */
    int zlib_text_strategy;         /* holds zlib compression strategy */
 #endif
@@ -408,6 +400,27 @@ struct png_struct_def
 #ifdef PNG_MNG_FEATURES_SUPPORTED
    png_byte filter_type;
 #endif
+
+#ifdef PNG_APNG_SUPPORTED
+   png_uint_32 apng_flags;
+   png_uint_32 next_seq_num;         /* next fcTL/fdAT chunk sequence number */
+   png_uint_32 first_frame_width;
+   png_uint_32 first_frame_height;
+
+#ifdef PNG_READ_APNG_SUPPORTED
+   png_uint_32 num_frames_read;      /* incremented after all image data of */
+                                     /* a frame is read */
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+   png_progressive_frame_ptr frame_info_fn; /* frame info read callback */
+   png_progressive_frame_ptr frame_end_fn;  /* frame data read callback */
+#endif
+#endif
+
+#ifdef PNG_WRITE_APNG_SUPPORTED
+   png_uint_32 num_frames_to_write;
+   png_uint_32 num_frames_written;
+#endif
+#endif /* PNG_APNG_SUPPORTED */
 
 /* New members added in libpng-1.2.0 */
 

@@ -1005,10 +1005,11 @@ file_end(struct file *file)
 
    if (file->out != NULL)
    {
-      /* NOTE: this is bitwise |, all the following functions must execute and
-       * must succeed.
-       */
-      if (ferror(file->out) | fflush(file->out) | fclose(file->out))
+      int ef = 0;
+      ef += ferror(file->out);
+      ef += fflush(file->out);
+      ef += fclose(file->out);
+      if (ef != 0)
       {
          perror(file->out_name);
          emit_error(file, READ_ERROR_CODE, "output write error");
@@ -3979,15 +3980,11 @@ main(int argc, const char **argv)
                memcpy(temp_name, prefix, prefixlen);
                memcpy(temp_name+prefixlen, *argv, outlen);
                outlen += prefixlen;
+               temp_name[outlen] = 0;
                outfile = temp_name;
             }
 
             else if (suffix != NULL)
-               memcpy(temp_name, *argv, outlen);
-
-            temp_name[outlen] = 0;
-
-            if (suffix != NULL)
             {
                size_t suffixlen = strlen(suffix);
 
@@ -3999,6 +3996,7 @@ main(int argc, const char **argv)
                   continue;
                }
 
+               memcpy(temp_name, *argv, outlen);
                memcpy(temp_name+outlen, suffix, suffixlen);
                outlen += suffixlen;
                temp_name[outlen] = 0;

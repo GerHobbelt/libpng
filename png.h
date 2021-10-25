@@ -1,9 +1,9 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.37 - April 14, 2019
+ * libpng version 1.6.38.git
  *
- * Copyright (c) 2018-2019 Cosmin Truta
+ * Copyright (c) 2018-2020 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -27,8 +27,8 @@
  * PNG Reference Library License version 2
  * ---------------------------------------
  *
- *  * Copyright (c) 1995-2019 The PNG Reference Library Authors.
- *  * Copyright (c) 2018-2019 Cosmin Truta.
+ *  * Copyright (c) 1995-2020 The PNG Reference Library Authors.
+ *  * Copyright (c) 2018-2020 Cosmin Truta.
  *  * Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
  *  * Copyright (c) 1996-1997 Andreas Dilger.
  *  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -166,6 +166,21 @@
  * been distributed and maintained world-wide, continually since 1995,
  * the Copyright owners claim "common-law trademark protection" in any
  * jurisdiction where common-law trademark is recognized.
+ *
+ * OSI CERTIFICATION:
+ *
+ * Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is
+ * a certification mark of the Open Source Initiative. OSI has not addressed
+ * the additional disclaimers inserted at version 1.0.7.
+ *
+ * EXPORT CONTROL:
+ *
+ * The Copyright owner believes that the Export Control Classification
+ * Number (ECCN) for libpng is EAR99, which means not subject to export
+ * controls or International Traffic in Arms Regulations (ITAR) because
+ * it is open source, publicly available software, that does not contain
+ * any encryption software.  See the EAR, paragraphs 734.3(b)(3) and
+ * 734.7(b).
  */
 
 /*
@@ -263,6 +278,63 @@
  * <https://www.w3.org/TR/2003/REC-PNG-20031110/>
  */
 
+/*
+ * Y2K compliance in libpng:
+ * =========================
+ *
+ *    September 29, 2017
+ *
+ *    Since the PNG Development group is an ad-hoc body, we can't make
+ *    an official declaration.
+ *
+ *    This is your unofficial assurance that libpng from version 0.71 and
+ *    upward through 1.6.34 are Y2K compliant.  It is my belief that
+ *    earlier versions were also Y2K compliant.
+ *
+ *    Libpng only has two year fields.  One is a 2-byte unsigned integer
+ *    that will hold years up to 65535.  The other, which is deprecated,
+ *    holds the date in text format, and will hold years up to 9999.
+ *
+ *    The integer is
+ *        "png_uint_16 year" in png_time_struct.
+ *
+ *    The string is
+ *        "char time_buffer[29]" in png_struct.  This is no longer used
+ *    in libpng-1.6.x and will be removed from libpng-1.7.0.
+ *
+ *    There are seven time-related functions:
+ *        png.c: png_convert_to_rfc_1123_buffer() in png.c
+ *          (formerly png_convert_to_rfc_1123() prior to libpng-1.5.x and
+ *          png_convert_to_rfc_1152() in error prior to libpng-0.98)
+ *        png_convert_from_struct_tm() in pngwrite.c, called in pngwrite.c
+ *        png_convert_from_time_t() in pngwrite.c
+ *        png_get_tIME() in pngget.c
+ *        png_handle_tIME() in pngrutil.c, called in pngread.c
+ *        png_set_tIME() in pngset.c
+ *        png_write_tIME() in pngwutil.c, called in pngwrite.c
+ *
+ *    All handle dates properly in a Y2K environment.  The
+ *    png_convert_from_time_t() function calls gmtime() to convert from system
+ *    clock time, which returns (year - 1900), which we properly convert to
+ *    the full 4-digit year.  There is a possibility that libpng applications
+ *    are not passing 4-digit years into the png_convert_to_rfc_1123_buffer()
+ *    function, or that they are incorrectly passing only a 2-digit year
+ *    instead of "year - 1900" into the png_convert_from_struct_tm() function,
+ *    but this is not under our control.  The libpng documentation has always
+ *    stated that it works with 4-digit years, and the APIs have been
+ *    documented as such.
+ *
+ *    The tIME chunk itself is also Y2K compliant.  It uses a 2-byte unsigned
+ *    integer to hold the year, and can hold years as large as 65535.
+ *
+ *    zlib, upon which libpng depends, is also Y2K compliant.  It contains
+ *    no date-related code.
+ *
+ *       Glenn Randers-Pehrson
+ *       libpng maintainer
+ *       PNG Development Group
+ */
+
 #ifndef PNG_H
 #define PNG_H
 
@@ -278,8 +350,8 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.37"
-#define PNG_HEADER_VERSION_STRING " libpng version 1.6.37 - April 14, 2019\n"
+#define PNG_LIBPNG_VER_STRING "1.6.38.git"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.6.38.git\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -287,12 +359,12 @@
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   6
-#define PNG_LIBPNG_VER_RELEASE 37
+#define PNG_LIBPNG_VER_RELEASE 38
 
 /* This should be zero for a public release, or non-zero for a
  * development version.  [Deprecated]
  */
-#define PNG_LIBPNG_VER_BUILD  0
+#define PNG_LIBPNG_VER_BUILD  1
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -309,7 +381,7 @@
 #define PNG_LIBPNG_BUILD_SPECIAL 32 /* Cannot be OR'ed with
                                        PNG_LIBPNG_BUILD_PRIVATE */
 
-#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_STABLE
+#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_BETA
 
 /* Careful here.  At one time, Guy wanted to use 082, but that
  * would be octal.  We must not include leading zeros.
@@ -318,7 +390,7 @@
  * From version 1.0.1 it is:
  * XXYYZZ, where XX=major, YY=minor, ZZ=release
  */
-#define PNG_LIBPNG_VER 10637 /* 1.6.37 */
+#define PNG_LIBPNG_VER 10638 /* 1.6.38.git */
 
 /* Library configuration: these options cannot be changed after
  * the library has been built.
@@ -329,6 +401,10 @@
  */
 #   include "pnglibconf.h"
 #endif
+
+#define PNG_APNG_SUPPORTED
+#define PNG_READ_APNG_SUPPORTED
+#define PNG_WRITE_APNG_SUPPORTED
 
 #ifndef PNG_VERSION_INFO_ONLY
 /* Machine specific configuration. */
@@ -425,10 +501,21 @@ extern "C" {
  * See pngconf.h for base types that vary by machine/system
  */
 
+#ifdef PNG_APNG_SUPPORTED
+/* dispose_op flags from inside fcTL */
+#define PNG_DISPOSE_OP_NONE        0x00U
+#define PNG_DISPOSE_OP_BACKGROUND  0x01U
+#define PNG_DISPOSE_OP_PREVIOUS    0x02U
+
+/* blend_op flags from inside fcTL */
+#define PNG_BLEND_OP_SOURCE        0x00U
+#define PNG_BLEND_OP_OVER          0x01U
+#endif /* PNG_APNG_SUPPORTED */
+
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_37;
+typedef char* png_libpng_version_1_6_38_git;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
@@ -746,6 +833,10 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_INFO_sCAL 0x4000U  /* ESR, 1.0.6 */
 #define PNG_INFO_IDAT 0x8000U  /* ESR, 1.0.6 */
 #define PNG_INFO_eXIf 0x10000U /* GR-P, 1.6.31 */
+#ifdef PNG_APNG_SUPPORTED
+#define PNG_INFO_acTL 0x20000U
+#define PNG_INFO_fcTL 0x40000U
+#endif
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -783,6 +874,10 @@ typedef PNG_CALLBACK(void, *png_write_status_ptr, (png_structp, png_uint_32,
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 typedef PNG_CALLBACK(void, *png_progressive_info_ptr, (png_structp, png_infop));
 typedef PNG_CALLBACK(void, *png_progressive_end_ptr, (png_structp, png_infop));
+#ifdef PNG_APNG_SUPPORTED
+typedef PNG_CALLBACK(void, *png_progressive_frame_ptr, (png_structp,
+    png_uint_32));
+#endif
 
 /* The following callback receives png_uint_32 row_number, int pass for the
  * png_bytep data of the row.  When transforming an interlaced image the
@@ -3213,6 +3308,11 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #endif
 #define PNG_OPTION_NEXT  12 /* Next option - numbers must be even */
 
+
+#ifdef PNG_LOONGSON_MMI_API_SUPPORTED
+#  define PNG_LOONGSON_MMI   14 /* HARDWARE: LOONGSON MMI SIMD instructions supported */
+#endif
+
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
 #define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
 #define PNG_OPTION_INVALID 1 /* Option number out of range */
@@ -3226,6 +3326,74 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
 /*******************************************************************************
  *  END OF HARDWARE AND SOFTWARE OPTIONS
  ******************************************************************************/
+#ifdef PNG_APNG_SUPPORTED
+PNG_EXPORT(250, png_uint_32, png_get_acTL, (png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 *num_frames, png_uint_32 *num_plays));
+
+PNG_EXPORT(251, png_uint_32, png_set_acTL, (png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 num_frames, png_uint_32 num_plays));
+
+PNG_EXPORT(252, png_uint_32, png_get_num_frames, (png_structp png_ptr,
+   png_infop info_ptr));
+
+PNG_EXPORT(253, png_uint_32, png_get_num_plays, (png_structp png_ptr,
+   png_infop info_ptr));
+
+PNG_EXPORT(254, png_uint_32, png_get_next_frame_fcTL,
+   (png_structp png_ptr, png_infop info_ptr, png_uint_32 *width,
+   png_uint_32 *height, png_uint_32 *x_offset, png_uint_32 *y_offset,
+   png_uint_16 *delay_num, png_uint_16 *delay_den, png_byte *dispose_op,
+   png_byte *blend_op));
+
+PNG_EXPORT(255, png_uint_32, png_set_next_frame_fcTL,
+   (png_structp png_ptr, png_infop info_ptr, png_uint_32 width,
+   png_uint_32 height, png_uint_32 x_offset, png_uint_32 y_offset,
+   png_uint_16 delay_num, png_uint_16 delay_den, png_byte dispose_op,
+   png_byte blend_op));
+
+PNG_EXPORT(256, png_uint_32, png_get_next_frame_width,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(257, png_uint_32, png_get_next_frame_height,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(258, png_uint_32, png_get_next_frame_x_offset,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(259, png_uint_32, png_get_next_frame_y_offset,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(260, png_uint_16, png_get_next_frame_delay_num,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(261, png_uint_16, png_get_next_frame_delay_den,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(262, png_byte, png_get_next_frame_dispose_op,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(263, png_byte, png_get_next_frame_blend_op,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(264, png_byte, png_get_first_frame_is_hidden,
+   (png_structp png_ptr, png_infop info_ptr));
+PNG_EXPORT(265, png_uint_32, png_set_first_frame_is_hidden,
+   (png_structp png_ptr, png_infop info_ptr, png_byte is_hidden));
+
+#ifdef PNG_READ_APNG_SUPPORTED
+PNG_EXPORT(266, void, png_read_frame_head, (png_structp png_ptr,
+   png_infop info_ptr));
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+PNG_EXPORT(267, void, png_set_progressive_frame_fn, (png_structp png_ptr,
+   png_progressive_frame_ptr frame_info_fn,
+   png_progressive_frame_ptr frame_end_fn));
+#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+#endif /* PNG_READ_APNG_SUPPORTED */
+
+#ifdef PNG_WRITE_APNG_SUPPORTED
+PNG_EXPORT(268, void, png_write_frame_head, (png_structp png_ptr,
+   png_infop info_ptr, png_bytepp row_pointers,
+   png_uint_32 width, png_uint_32 height,
+   png_uint_32 x_offset, png_uint_32 y_offset,
+   png_uint_16 delay_num, png_uint_16 delay_den, png_byte dispose_op,
+   png_byte blend_op));
+
+PNG_EXPORT(269, void, png_write_frame_tail, (png_structp png_ptr,
+   png_infop info_ptr));
+#endif /* PNG_WRITE_APNG_SUPPORTED */
+#endif /* PNG_APNG_SUPPORTED */
 
 /* Maintainer: Put new public prototypes here ^, in libpng.3, in project
  * defs, and in scripts/symbols.def.
@@ -3235,7 +3403,11 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
+#ifdef PNG_APNG_SUPPORTED
+  PNG_EXPORT_LAST_ORDINAL(269);
+#else
   PNG_EXPORT_LAST_ORDINAL(249);
+#endif /* PNG_APNG_SUPPORTED */
 #endif
 
 #ifdef __cplusplus
