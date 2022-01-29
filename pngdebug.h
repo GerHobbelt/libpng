@@ -51,6 +51,9 @@
 #ifdef PNG_DEBUG
 #  if (PNG_DEBUG > 0)
 #    if !defined(PNG_DEBUG_FILE) && defined(_MSC_VER)
+#      ifndef _CRTDBG_MAP_ALLOC
+#      define _CRTDBG_MAP_ALLOC
+#      endif
 #      include <crtdbg.h>
 #      if (PNG_DEBUG > 1)
 #        ifndef _DEBUG
