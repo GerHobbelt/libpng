@@ -66,7 +66,7 @@
 
 #include "zlib-ng.h"
 
-#ifndef ZLIB_VERNUM
+#if !defined(ZLIB_VERNUM) && !defined(ZLIBNG_VERNUM)
 #define ZLIB_VERNUM 0x2100
 #endif
 
