@@ -144,7 +144,7 @@
 #  include "../../png.h"
 #endif
 
-#include <zlib.h>
+#include <zlib-ng.h>
 
 /* Work round for GCC complaints about casting a (double) function result to
  * an unsigned:
@@ -397,7 +397,7 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
       image_size_of_type(color_type, bit_depth, colors, small)-1;
    png_uint_32 depth_max = (1U << bit_depth)-1; /* up to 65536 */
 
-   if (colors[0] == 0 && small)
+   if (colors[0] == 0) if (small)
    {
       unsigned int pixel_depth = pixel_depth_of_type(color_type, bit_depth);
 
