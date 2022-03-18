@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#if defined(_MSC_VER)
+#include <io.h>        // setmode()
+#endif
 
 #ifndef BOOL
 #define BOOL unsigned char
@@ -29,19 +32,22 @@
 
 /* function prototypes */
 
-int main (int argc, char *argv[]);
-void usage ();
-BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
+static void usage (void);
+static BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
               BOOL interlace, BOOL alpha);
-void get_token (FILE *pnm_file, char *token_buf, size_t token_buf_size);
-png_uint_32 get_data (FILE *pnm_file, int depth);
-png_uint_32 get_value (FILE *pnm_file, int depth);
+static void get_token (FILE *pnm_file, char *token_buf, size_t token_buf_size);
+static png_uint_32 get_data (FILE *pnm_file, int depth);
+static png_uint_32 get_value (FILE *pnm_file, int depth);
 
 /*
  *  main
  */
 
-int main (int argc, char *argv[])
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pnm2png_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
   FILE *fp_rd = stdin;
   FILE *fp_al = NULL;
@@ -115,9 +121,9 @@ int main (int argc, char *argv[])
    * we're reading the PNM always! in binary format
    */
   if (fp_rd == stdin)
-    setmode (fileno (stdin), O_BINARY);
+    (void)setmode(fileno (stdin), O_BINARY);
   if (fp_wr == stdout)
-    setmode (fileno (stdout), O_BINARY);
+    (void)setmode(fileno (stdout), O_BINARY);
 #endif
 
   /* call the conversion program itself */
@@ -143,7 +149,7 @@ int main (int argc, char *argv[])
  *  usage
  */
 
-void usage ()
+static void usage (void)
 {
   fprintf (stderr, "PNM2PNG\n");
   fprintf (stderr, "   by Willem van Schaik, 1999\n");
@@ -160,7 +166,7 @@ void usage ()
  *  pnm2png
  */
 
-BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
+static BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
               BOOL interlace, BOOL alpha)
 {
   png_struct    *png_ptr = NULL;
@@ -515,7 +521,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
  * get_token - gets the first string after whitespace
  */
 
-void get_token (FILE *pnm_file, char *token_buf, size_t token_buf_size)
+static void get_token (FILE *pnm_file, char *token_buf, size_t token_buf_size)
 {
   size_t i = 0;
   int ret;
@@ -559,7 +565,7 @@ void get_token (FILE *pnm_file, char *token_buf, size_t token_buf_size)
  *             using the bit-depth to fill up a byte (0Ah -> AAh)
  */
 
-png_uint_32 get_data (FILE *pnm_file, int depth)
+static png_uint_32 get_data (FILE *pnm_file, int depth)
 {
   static int bits_left = 0;
   static int old_value = 0;

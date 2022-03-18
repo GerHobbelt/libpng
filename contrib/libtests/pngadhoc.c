@@ -231,8 +231,12 @@ png_test_bKGD_tRNS_4bit()
    return 0;
 }
 
-int
-main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(void)      png_pngadhoc_main(void)
+#endif
+
+int main(void)
 {
    int ret;
 

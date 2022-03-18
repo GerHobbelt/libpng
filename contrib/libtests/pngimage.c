@@ -1581,8 +1581,12 @@ do_test(struct display *dp, const char *file)
    return ret;
 }
 
-int
-main(int argc, char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngimage_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    /* For each file on the command line test it with a range of transforms */
    int option_end, ilog = 0;
@@ -1713,11 +1717,17 @@ main(int argc, char **argv)
       return errors != 0;
    }
 }
+
 #else /* !READ_PNG */
-int
-main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngimage_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    fprintf(stderr, "pngimage: no support for png_read/write_image\n");
    return SKIP;
 }
+
 #endif

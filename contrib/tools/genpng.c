@@ -744,8 +744,12 @@ pixel(png_uint_16p p, struct arg *args, int nargs, double x, double y)
       p[3] = p[2] = p[1] = p[0] = 0;
 }
 
-int
-main(int argc, const char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_genpng_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    int convert_to_8bit = 0;
 

@@ -30,16 +30,18 @@
 
 #include "../../pngpriv.h"
 
+#undef verbose
+
 #define png_error png_warning
 
-void png_warning(png_const_structrp png_ptr, png_const_charp msg)
+static void png_warning(png_const_structrp png_ptr, png_const_charp msg)
 {
    fprintf(stderr, "validation: %s\n", msg);
 }
 
 #define png_fixed_error png_fixed_warning
 
-void png_fixed_warning(png_const_structrp png_ptr, png_const_charp msg)
+static void png_fixed_warning(png_const_structrp png_ptr, png_const_charp msg)
 {
    fprintf(stderr, "overflow in: %s\n", msg);
 }
@@ -71,7 +73,7 @@ void png_fixed_warning(png_const_structrp png_ptr, png_const_charp msg)
 /* Validate ASCII to fp routines. */
 static int verbose = 0;
 
-int validation_ascii_to_fp(int count, int argc, char **argv)
+static int validation_ascii_to_fp(int count, int argc, const char **argv)
 {
    int    showall = 0;
    double max_error=2;      /* As a percentage error-in-last-digit/.5 */
@@ -561,7 +563,7 @@ static int check_some_characters(checkfp_command *co, checkfp_control c,
    return 1;
 }
 
-int validation_checkfp(int count, int argc, char **argv)
+static int validation_checkfp(int count, int argc, const char **argv)
 {
    int result;
    checkfp_command command;
@@ -611,7 +613,7 @@ int validation_checkfp(int count, int argc, char **argv)
    return result;
 }
 
-int validation_muldiv(int count, int argc, char **argv)
+static int validation_muldiv(int count, int argc, const char **argv)
 {
    int tested = 0;
    int overflow = 0;
@@ -774,7 +776,7 @@ static png_uint_16 png_exp16bit(png_uint_32 log)
 }
 #endif /* FLOATING_ARITHMETIC */
 
-int validation_gamma(int argc, char **argv)
+static int validation_gamma(int argc, const char **argv)
 {
    double gamma[9] = { 2.2, 1.8, 1.52, 1.45, 1., 1/1.45, 1/1.52, 1/1.8, 1/2.2 };
    double maxerr;
@@ -964,7 +966,12 @@ int validation_gamma(int argc, char **argv)
  */
 #define COUNT 1000000000
 
-int main(int argc, char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_tarith_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    int count = COUNT;
 

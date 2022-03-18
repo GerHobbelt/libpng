@@ -359,7 +359,12 @@ usage(FILE *fp)
    exit(99);
 }
 
-int main(int argc, char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_timepng_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    int ok = 0;
    int err = 0;
@@ -602,6 +607,16 @@ int main(int argc, char **argv)
    /* Exit code 0 on success. */
    return ok == 0;
 }
+
 #else /* !sufficient support */
-int main(void) { return 77; }
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_timepng_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
+{
+	return 77;
+}
+
 #endif /* !sufficient support */

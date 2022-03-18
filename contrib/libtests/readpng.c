@@ -106,8 +106,12 @@ read_png(FILE *fp)
    return 1;
 }
 
-int
-main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(void)      png_redpng_main(void)
+#endif
+
+int main(void)
 {
    /* Exit code 0 on success. */
    return !read_png(stdin);

@@ -30,7 +30,7 @@
  */
 
 #include <stdio.h>
-#include <zlib.h>
+#include <zlib-ng.h>
 
 #define MAX_LENGTH 500000
 
@@ -38,8 +38,13 @@
 #define GETBREAK inchar=getchar(); \
                  c=(inchar & 0xffU);\
                  if (inchar != c) break
-int
-main(void)
+
+
+#if defined(BUILD_MONOLITHIC)
+#define main(void)      png_fix_itxt_main(void)
+#endif
+
+int main(void)
 {
    unsigned int i;
    unsigned char buf[MAX_LENGTH];
@@ -78,7 +83,7 @@ for (;;)
          break;  /* To do: handle this more gracefully */
 
       /* Initialize the CRC */
-      crc = crc32(0, Z_NULL, 0);
+      crc = zng_crc32(0, Z_NULL, 0);
 
       /* Copy the data bytes */
       for (i=8; i < length + 12; i++)
@@ -90,7 +95,7 @@ for (;;)
          break;
 
       /* Calculate the CRC */
-      crc = crc32(crc, buf+4, (uInt)length+4);
+      crc = zng_crc32(crc, buf+4, (uInt)length+4);
 
       for (;;)
       {
@@ -110,7 +115,7 @@ for (;;)
         buf[length+11] = c;
 
         /* Update the CRC */
-        crc = crc32(crc, buf+7+length, 1);
+        crc = zng_crc32(crc, buf+7+length, 1);
       }
 
       if (inchar != c) /* EOF */

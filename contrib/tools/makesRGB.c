@@ -71,8 +71,12 @@ invsRGB(unsigned int i)
    return (png_uint_16)x;
 }
 
-int
-main(int argc, char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_makeesRGB_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    unsigned int i, i16, ibase;
    double min_error = 0;

@@ -26,9 +26,10 @@
 
 #include <png.h>
 
+#undef verbose
+
 #if defined(PNG_READ_SUPPORTED) && defined(PNG_STDIO_SUPPORTED) && \
     defined (PNG_iCCP_SUPPORTED)
-
 
 static int verbose = 1;
 static png_byte no_profile[] = "no profile";
@@ -164,8 +165,12 @@ extract_one_file(const char *filename)
    return result;
 }
 
-int
-main(int argc, char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_iccfrompng_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    int i;
    int extracted = 0;
@@ -182,4 +187,5 @@ main(int argc, char **argv)
    /* Exit code is true if any extract succeeds */
    return extracted == 0;
 }
+
 #endif /* READ && STDIO && iCCP */

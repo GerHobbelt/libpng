@@ -13,14 +13,14 @@
  */
 #include <stdio.h>
 
-#include <zlib.h>
+#include <zlib-ng.h>
 
 static int
 read_one_file(FILE *ip, const char *name)
 {
    uLong length = 0;
-   uLong a32 = adler32(0, NULL, 0);
-   uLong c32 = crc32(0, NULL, 0);
+   uLong a32 = zng_adler32(0, NULL, 0);
+   uLong c32 = zng_crc32(0, NULL, 0);
    Byte header[132];
 
    for (;;)
@@ -36,8 +36,8 @@ read_one_file(FILE *ip, const char *name)
          header[length] = b;
 
       ++length;
-      a32 = adler32(a32, &b, 1);
-      c32 = crc32(c32, &b, 1);
+      a32 = zng_adler32(a32, &b, 1);
+      c32 = zng_crc32(c32, &b, 1);
    }
 
    if (ferror(ip))
@@ -61,7 +61,12 @@ read_one_file(FILE *ip, const char *name)
    return 1;
 }
 
-int main(int argc, char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_checksum_icc_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    int err = 0;
 

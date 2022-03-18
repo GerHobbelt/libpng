@@ -22,10 +22,15 @@
  * ensure the code picks up the local libpng implementation:
  */
 #include "../../png.h"
+
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) && \
     defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 
-int main(int argc, const char **argv)
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngtopng_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    int result = 1;
 
@@ -95,4 +100,5 @@ int main(int argc, const char **argv)
 
    return result;
 }
+
 #endif /* READ && WRITE */
