@@ -18,6 +18,8 @@
 #include <errno.h>
 #include <assert.h>
 
+#undef verbose
+
 #define implies(x,y) assert(!(x) || (y))
 
 #ifdef __GNUC__
@@ -63,7 +65,7 @@
    /* We must ensure that zlib uses 'const' in declarations. */
 #  define ZLIB_CONST
 #endif
-#include <zlib.h>
+#include <zlib-ng.h>
 #ifdef const
    /* zlib.h sometimes #defines const to nothing, undo this. */
 #  undef const
@@ -72,7 +74,7 @@
 /* zlib.h has mediocre z_const use before 1.2.6, this stuff is for compatibility
  * with older builds.
  */
-#if ZLIB_VERNUM < 0x1260
+#if ZLIBNG_VERNUM < 0x1260
 #  define PNGZ_MSG_CAST(s) constcast(char*,s)
 #  define PNGZ_INPUT_CAST(b) constcast(png_bytep,b)
 #else
@@ -84,7 +86,7 @@
 #  error "pngfix not supported in this libpng version"
 #endif
 
-#if ZLIB_VERNUM >= 0x1240
+#if ZLIBNG_VERNUM >= 0x1240
 
 /* Copied from pngpriv.h */
 #ifdef __cplusplus
@@ -2029,7 +2031,7 @@ struct zlib
    int            cksum;                 /* Set on a checksum error */
 
    /* PROTECTED ZLIB INFORMATION: USED BY THE ZLIB ROUTINES */
-   z_stream       z;
+   zng_stream       z;
    png_uint_32    extra_bytes;   /* Count of extra compressed bytes */
    int            state;
    int            rc;            /* Last return code */
@@ -2157,7 +2159,7 @@ zlib_end(struct zlib *zlib)
 
    if (zlib->state >= 0)
    {
-      zlib->rc = inflateEnd(&zlib->z);
+      zlib->rc = zng_inflateEnd(&zlib->z);
 
       if (zlib->rc != Z_OK)
          zlib_message(zlib, 1/*unexpected*/);
@@ -2182,7 +2184,7 @@ zlib_reset(struct zlib *zlib, int window_bits)
    zlib->uncompressed_digits = 0;
 
    zlib->state = 0; /* initialized, once */
-   zlib->rc = inflateReset2(&zlib->z, 0);
+   zlib->rc = zng_inflateReset2(&zlib->z, 0);
    if (zlib->rc != Z_OK)
    {
       zlib_message(zlib, 1/*unexpected*/);
@@ -2228,7 +2230,7 @@ zlib_init(struct zlib *zlib, struct IDAT *idat, struct chunk *chunk,
    /* '0' means use the header; inflateInit2 should always succeed because it
     * does nothing apart from allocating the internal zstate.
     */
-   zlib->rc = inflateInit2(&zlib->z, 0);
+   zlib->rc = zng_inflateInit2(&zlib->z, 0);
    if (zlib->rc != Z_OK)
    {
       zlib_message(zlib, 1/*unexpected*/);
@@ -2373,7 +2375,7 @@ zlib_advance(struct zlib *zlib, png_uint_32 nbytes)
          zlib->z.avail_out = 1,
          ++out_bytes)
       {
-         zlib->rc = inflate(&zlib->z, flush);
+         zlib->rc = zng_inflate(&zlib->z, flush);
          out_bytes -= zlib->z.avail_out;
 
          switch (zlib->rc)
@@ -3855,8 +3857,12 @@ usage(const char *prog)
    exit(255);
 }
 
-int
-main(int argc, const char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngfix_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    char temp_name[FILENAME_MAX+1];
    const char *  prog = *argv;
@@ -4016,32 +4022,45 @@ main(int argc, const char **argv)
    return global_end(&global);
 }
 
-#else /* ZLIB_VERNUM < 0x1240 */
-int
-main(void)
+#else /* ZLIBNG_VERNUM < 0x1240 */
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngfix_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    fprintf(stderr,
-      "pngfix needs libpng with a zlib >=1.2.4 (not 0x%x)\n",
-      ZLIB_VERNUM);
+      "pngfix needs libpng with a zlib-ng >=1.2.4 (not 0x%x)\n",
+      ZLIBNG_VERNUM);
    return 77;
 }
-#endif /* ZLIB_VERNUM */
+#endif /* ZLIBNG_VERNUM */
 
 #else /* No read support */
 
-int
-main(void)
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngfix_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    fprintf(stderr, "pngfix does not work without read deinterlace support\n");
    return 77;
 }
+
 #endif /* PNG_READ_SUPPORTED && PNG_EASY_ACCESS_SUPPORTED */
 #else /* No setjmp support */
-int
-main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngfix_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    fprintf(stderr, "pngfix does not work without setjmp support\n");
    return 77;
 }
+
 #endif /* PNG_SETJMP_SUPPORTED */
 

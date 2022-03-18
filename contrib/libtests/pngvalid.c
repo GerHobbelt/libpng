@@ -35,6 +35,8 @@
 #  include <fenv.h>
 #endif
 
+#undef verbose
+
 #ifndef FE_DIVBYZERO
 #  define FE_DIVBYZERO 0
 #endif
@@ -57,7 +59,7 @@
 #ifdef PNG_ZLIB_HEADER
 #  include PNG_ZLIB_HEADER
 #else
-#  include <zlib.h>   /* For crc32 */
+#  include <zlib-ng.h>   /* For crc32 */
 #endif
 
 /* 1.6.1 added support for the configure test harness, which uses 77 to indicate
@@ -1601,7 +1603,7 @@ store_read_chunk(png_store *ps, png_bytep pb, size_t max, size_t min)
                   avail = (uInt)/*SAFE*/((chunklen-4U) - chunkpos);
 
                store_read_imp(ps, pb, avail);
-               ps->IDAT_crc = crc32(ps->IDAT_crc, pb, avail);
+               ps->IDAT_crc = zng_crc32(ps->IDAT_crc, pb, avail);
                pb += (size_t)/*SAFE*/avail;
                st -= (size_t)/*SAFE*/avail;
                chunkpos += (png_uint_32)/*SAFE*/avail;
@@ -2973,7 +2975,7 @@ modifier_crc(png_bytep buffer)
     * the buffer, at the start.
     */
    uInt datalen = png_get_uint_32(buffer);
-   uLong crc = crc32(0, buffer+4, datalen+4);
+   uLong crc = zng_crc32(0, buffer+4, datalen+4);
    /* The cast to png_uint_32 is safe because a crc32 is always a 32 bit value.
     */
    png_save_uint_32(buffer+datalen+8, (png_uint_32)crc);
@@ -11669,7 +11671,12 @@ static void signal_handler(int signum)
 }
 
 /* main program */
-int main(int argc, char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngvalid_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    int summary = 1;  /* Print the error summary at the end */
    int memstats = 0; /* Print memory statistics at the end */
@@ -12268,12 +12275,19 @@ int main(int argc, char **argv)
    UNUSED(fail)
    return 0;
 }
+
 #else /* write or low level APIs not supported */
-int main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngvalid_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    fprintf(stderr,
       "pngvalid: no low level write support in libpng, all tests skipped\n");
    /* So the test is skipped: */
    return SKIP;
 }
+
 #endif

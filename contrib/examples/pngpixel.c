@@ -138,7 +138,12 @@ print_pixel(png_structp png_ptr, png_infop info_ptr, png_const_bytep row,
    }
 }
 
-int main(int argc, const char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngpixel_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    /* This program uses the default, <setjmp.h> based, libpng error handling
     * mechanism, therefore any local variable that exists before the call to
@@ -368,4 +373,5 @@ int main(int argc, const char **argv)
 
    return result;
 }
+
 #endif /* READ && SEQUENTIAL_READ */

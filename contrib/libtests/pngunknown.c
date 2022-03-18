@@ -1117,8 +1117,12 @@ usage(const char *program, const char *reason)
    exit(99);
 }
 
-int
-main(int argc, const char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngunknown_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    FILE *fp;
    png_uint_32 default_flags[4]; /*valid,unknown{before,after}*/
@@ -1283,23 +1287,33 @@ main(int argc, const char **argv)
 }
 
 #else /* !(READ_USER_CHUNKS || SAVE_UNKNOWN_CHUNKS) */
-int
-main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngunknown_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    fprintf(stderr,
       " test ignored: no support to find out about unknown chunks\n");
    /* So the test is skipped: */
    return SKIP;
 }
+
 #endif /* READ_USER_CHUNKS || SAVE_UNKNOWN_CHUNKS */
 
 #else /* !(SET_UNKNOWN_CHUNKS && READ) */
-int
-main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngunknown_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    fprintf(stderr,
       " test ignored: no support to modify unknown chunk handling\n");
    /* So the test is skipped: */
    return SKIP;
 }
+
 #endif /* SET_UNKNOWN_CHUNKS && READ*/

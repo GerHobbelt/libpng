@@ -526,7 +526,12 @@ out:
    return result;
 }
 
-int main(int argc, const char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_simple_over_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    int result = 1; /* default to fail */
 
@@ -645,4 +650,5 @@ int main(int argc, const char **argv)
 
    return result;
 }
+
 #endif /* SIMPLIFIED_READ */

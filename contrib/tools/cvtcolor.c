@@ -45,8 +45,12 @@ component(const char *prog, const char *arg, int issRGB)
    return c;
 }
 
-int
-main(int argc, const char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_cvtcolor_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    const char *prog = *argv++;
    int to_linear = 0, to_gray = 0, to_color = 0;

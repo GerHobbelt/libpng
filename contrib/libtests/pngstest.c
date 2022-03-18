@@ -1,4 +1,3 @@
-
 /* pngstest.c
  *
  * Copyright (c) 2021 Cosmin Truta
@@ -232,6 +231,7 @@ YfromRGBint(int ir, int ig, int ib)
 }
 
 #if 0 /* unused */
+
 /* The error that results from using a 2.2 power law in place of the correct
  * sRGB transform, given an 8-bit value which might be either sRGB or power-law.
  */
@@ -322,6 +322,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 
    return 0;
 }
+
 #endif /* unused */
 
 #define USE_FILE 1       /* else memory */
@@ -3488,8 +3489,12 @@ test_one_file(const char *file_name, format_list *formats, png_uint_32 opts,
    return result;
 }
 
-int
-main(int argc, char **argv)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngstest_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    png_uint_32 opts = FAST_WRITE | STRICT;
    format_list formats;
@@ -3823,10 +3828,16 @@ main(int argc, char **argv)
 }
 
 #else /* !PNG_SIMPLIFIED_READ_SUPPORTED */
-int main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngstest_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    fprintf(stderr, "pngstest: no read support in libpng, test skipped\n");
    /* So the test is skipped: */
    return SKIP;
 }
+
 #endif /* PNG_SIMPLIFIED_READ_SUPPORTED */

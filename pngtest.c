@@ -70,7 +70,7 @@
 #ifdef PNG_ZLIB_HEADER
 #  include PNG_ZLIB_HEADER /* defined by pnglibconf.h from 1.7 */
 #else
-#  include "zlib.h"
+#  include "zlib-ng.h"
 #endif
 #undef verbose
 
@@ -1588,6 +1588,7 @@ test_one_file(const char *inname, const char *outname)
    }
    else
 #endif
+#undef pass_height 
    for (pass = 0; pass < num_passes; pass++)
    {
 #     ifdef calc_pass_height
@@ -1644,6 +1645,7 @@ test_one_file(const char *inname, const char *outname)
 #endif /* !SINGLE_ROWBUF_ALLOC */
       }
    }
+#undef pass_height 
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 #  ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
@@ -1874,7 +1876,7 @@ test_one_file(const char *inname, const char *outname)
                    "\n   filtering heuristic (libpng default), compression");
                fprintf(STDERR,
                    " level (zlib default),\n   and zlib version (%s)?\n\n",
-                   ZLIB_VERSION);
+                   ZLIBNG_VERSION);
                wrote_question = 1;
             }
 
@@ -1906,7 +1908,7 @@ test_one_file(const char *inname, const char *outname)
                    "\n   filtering heuristic (libpng default), compression");
                fprintf(STDERR,
                    " level (zlib default),\n   and zlib version (%s)?\n\n",
-                 ZLIB_VERSION);
+                 ZLIBNG_VERSION);
                wrote_question = 1;
             }
 
@@ -1943,8 +1945,11 @@ static const char *inname = "pngtest.png";
 static const char *outname = "pngout.png";
 #endif
 
-int
-main(int argc, char *argv[])
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngtest_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    int multiple = 0;
    int ierror = 0;
@@ -1952,7 +1957,7 @@ main(int argc, char *argv[])
    png_structp dummy_ptr;
 
    fprintf(STDERR, "\n Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
-   fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
+   fprintf(STDERR, "   with zlib   version %s\n", ZLIBNG_VERSION);
    fprintf(STDERR, "%s", png_get_copyright(NULL));
    /* Show the version of libpng used in building the library */
    fprintf(STDERR, " library (%lu):%s",
@@ -2268,15 +2273,21 @@ main(int argc, char *argv[])
 
    return (int)(ierror != 0);
 }
+
 #else
-int
-main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_pngtest_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
    fprintf(STDERR,
        " test ignored because libpng was not built with read support\n");
    /* And skip this test */
    return PNG_LIBPNG_VER < 10600 ? 0 : 77;
 }
+
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */

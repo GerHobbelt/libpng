@@ -73,7 +73,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include <zlib.h>
+#include <zlib-ng.h>
 
 #ifndef PNG_SETJMP_SUPPORTED
 #  include <setjmp.h> /* because png.h did *not* include this */
@@ -1316,7 +1316,7 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
    }
 
    else /* something else */
-      assert(0=="reached");
+      assert(!"reached");
 
    if (record)
       record_opt(dp, opt, entry_name);

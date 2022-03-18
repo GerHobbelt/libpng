@@ -8,7 +8,7 @@
  */
 
 #include <stdio.h>
-#include <zlib.h> /* for crc32 */
+#include <zlib-ng.h> /* for crc32 */
 
 void
 put_uLong(uLong val)
@@ -28,8 +28,8 @@ put_chunk(const unsigned char *chunk, uInt length)
 
    fwrite(chunk, length, 1, stdout);
 
-   crc = crc32(0, Z_NULL, 0);
-   put_uLong(crc32(crc, chunk, length));
+   crc = zng_crc32(0, Z_NULL, 0);
+   put_uLong(zng_crc32(crc, chunk, length));
 }
 
 const unsigned char signature[] =
@@ -54,8 +54,12 @@ const unsigned char unknown[] =
    'u', 'n', 'K', 'n' /* "unKn" - private safe to copy */
 };
 
-int
-main(void)
+
+#if defined(BUILD_MONOLITHIC)
+#define main(void)      png_fakepng_main(void)
+#endif
+
+int main(void)
 {
    fwrite(signature, sizeof signature, 1, stdout);
    put_chunk(IHDR, sizeof IHDR);

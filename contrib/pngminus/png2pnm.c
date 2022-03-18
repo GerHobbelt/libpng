@@ -9,6 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#ifdef _WIN32
+#include <io.h>    // setmode()
+#endif
+
 
 #ifndef BOOL
 #define BOOL unsigned char
@@ -29,16 +33,19 @@
 
 /* function prototypes */
 
-int main (int argc, char *argv[]);
-void usage ();
-BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
+static void usage (void);
+static BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
               BOOL raw, BOOL alpha);
 
 /*
  *  main
  */
 
-int main (int argc, char *argv[])
+#if defined(BUILD_MONOLITHIC)
+#define main(cnt, arr)      png_png2pnm_main(cnt, arr)
+#endif
+
+int main(int argc, const char** argv)
 {
   FILE *fp_rd = stdin;
   FILE *fp_wr = stdout;
@@ -113,9 +120,9 @@ int main (int argc, char *argv[])
 #if defined(O_BINARY) && (O_BINARY != 0)
   /* set stdin/stdout if required to binary */
   if (fp_rd == stdin)
-    setmode (fileno (stdin), O_BINARY);
+    (void)setmode(fileno (stdin), O_BINARY);
   if ((raw) && (fp_wr == stdout))
-    setmode (fileno (stdout), O_BINARY);
+	  (void)setmode(fileno (stdout), O_BINARY);
 #endif
 
   /* call the conversion program itself */
@@ -141,7 +148,7 @@ int main (int argc, char *argv[])
  *  usage
  */
 
-void usage ()
+static void usage (void)
 {
   fprintf (stderr, "PNG2PNM\n");
   fprintf (stderr, "   by Willem van Schaik, 1999\n");
@@ -160,7 +167,7 @@ void usage ()
  *  png2pnm
  */
 
-BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
+static BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
               BOOL raw, BOOL alpha)
 {
   png_struct    *png_ptr = NULL;

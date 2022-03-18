@@ -20,6 +20,7 @@
  * however use <stdio.h> and it assumes that /proc/cpuinfo is never localized.
  */
 #include <stdio.h>
+#include "png.h"
 
 static int
 png_have_neon(png_structp png_ptr)
