@@ -71,6 +71,7 @@ if ("${INPUTEXT}" STREQUAL ".c" AND "${OUTPUTEXT}" STREQUAL ".out")
                           "-DPNG_BUILDING_SYMBOL_TABLE"
                           ${PNG_PREFIX_DEF}
                           "${INPUT}"
+                  COMMAND_ECHO STDOUT
                   OUTPUT_FILE "${OUTPUT}.tf1"
                   WORKING_DIRECTORY "${BINDIR}"
                   RESULT_VARIABLE CPP_FAIL)
@@ -80,6 +81,7 @@ if ("${INPUTEXT}" STREQUAL ".c" AND "${OUTPUTEXT}" STREQUAL ".out")
 
   execute_process(COMMAND "${AWK}" -f "${SRCDIR}/scripts/dfn.awk"
                           "out=${OUTPUT}.tf2" "${OUTPUT}.tf1"
+                  COMMAND_ECHO STDOUT
                   WORKING_DIRECTORY "${BINDIR}"
                   RESULT_VARIABLE AWK_FAIL)
   if(AWK_FAIL)
