@@ -4552,6 +4552,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
                png_error(png_ptr, "Not enough image data");
          }
 #endif /* PNG_READ_APNG_SUPPORTED */
+
          avail_in = png_ptr->IDAT_read_size;
 
          if (avail_in > png_ptr->idat_size)

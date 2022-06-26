@@ -127,10 +127,6 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
        * the application continues writing the PNG.  So check the 'invalid'
        * flag here too.
        */
-#ifdef PNG_WRITE_APNG_SUPPORTED
-   if ((info_ptr->valid & PNG_INFO_acTL) != 0)
-      png_write_acTL(png_ptr, info_ptr->num_frames, info_ptr->num_plays);
-#endif
 
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
          /* Write unknown chunks first; PNG v3 establishes a precedence order
@@ -143,6 +139,11 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
           * to give the app control.
           */
          write_unknown_chunks(png_ptr, info_ptr, PNG_HAVE_IHDR);
+#endif
+
+#ifdef PNG_WRITE_APNG_SUPPORTED
+   if ((info_ptr->valid & PNG_INFO_acTL) != 0)
+      png_write_acTL(png_ptr, info_ptr->num_frames, info_ptr->num_plays);
 #endif
 
 #ifdef PNG_WRITE_sBIT_SUPPORTED

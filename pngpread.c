@@ -726,7 +726,7 @@ png_push_read_IDAT(png_structrp png_ptr)
 #ifdef PNG_READ_APNG_SUPPORTED
       if (png_ptr->chunk_name != png_fdAT && png_ptr->num_frames_read > 0)
       {
-          if (png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED)
+          if ((png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED) != 0)
           {
               png_ptr->process_mode = PNG_READ_CHUNK_MODE;
               if (png_ptr->frame_end_fn != NULL)
