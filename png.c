@@ -821,7 +821,9 @@ png_get_copyright(png_const_structrp png_ptr)
       PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
-      PNG_STRING_NEWLINE;
+      PNG_STRING_NEWLINE \
+      "Portions Copyright (c) 2006-2007 Andrew Smith" PNG_STRING_NEWLINE \
+      "Portions Copyright (c) 2008-2019 Max Stepin" PNG_STRING_NEWLINE ;
 #endif
 }
 
