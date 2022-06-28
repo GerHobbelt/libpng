@@ -48,8 +48,15 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.12)
   # environment variable.
   cmake_policy(SET CMP0074 NEW)
 endif()
+
 hunter_add_package(ZLIB)
 find_package(ZLIB CONFIG REQUIRED)
+
+# This should have been found by the find_package above
+# but for some reason it doesn't get done when building libpng with prefixed APIs
+if (NOT ZLIB_INCLUDE_DIR)
+    set(ZLIB_INCLUDE_DIR "${ZLIB_ROOT}/include")
+endif()
 
 # COMMAND LINE OPTIONS
 option(PNG_TESTS  "Build libpng tests" YES)
@@ -62,8 +69,6 @@ option(PNG_MULTIARCH "Support multiple architectures within the same project" OF
 
 set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
 set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
-
-option(PNG_DISABLE_AWK "Disable AWK based scripts code generation" YES)
 
 if(PNG_HARDWARE_OPTIMIZATIONS)
 
@@ -273,7 +278,7 @@ find_program(AWK NAMES gawk awk)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 include(CMakeParseArguments)
-if(NOT AWK OR ANDROID OR PNG_DISABLE_AWK)
+if(NOT AWK)
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
@@ -465,7 +470,7 @@ set(libpng_private_hdrs
   pnginfo.h
   pngstruct.h
 )
-if(AWK AND NOT ANDROID AND NOT PNG_DISABLE_AWK)
+if(AWK)
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
 endif()
 set(libpng_sources
