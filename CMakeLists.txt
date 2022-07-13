@@ -278,8 +278,11 @@ find_program(AWK NAMES gawk awk)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 include(CMakeParseArguments)
-if(NOT AWK OR NOT PNG_PREFIX)
-  # No awk available to generate sources; use pre-built pnglibconf.h
+
+if(PNG_PREFIX AND NOT AWK)
+    message(FATAL_ERROR "libpng API prefixing is requested but awk/gawk tools are unavailable to do file generation")
+elseif(NOT PNG_PREFIX)
+  # Use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
   add_custom_target(genfiles) # Dummy
