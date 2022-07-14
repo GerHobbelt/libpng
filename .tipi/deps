@@ -1,0 +1,4 @@
+{
+  "x" : [ "contrib", "scripts", "arm", "mips", "powerpc", "example.c" ],
+  "platform" : ["ZLIB::+ZLIB"]
+}

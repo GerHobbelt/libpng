@@ -72,3 +72,4 @@ timepng
 
 # Libpng CI artifacts
 out/
+/build
