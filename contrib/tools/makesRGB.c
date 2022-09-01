@@ -29,6 +29,9 @@
 /* The tables are declared 'const' in pngpriv.h, so this redefines the tables to
  * be used.
  */
+#undef png_sRGB_table 
+#undef png_sRGB_base 
+#undef png_sRGB_delta 
 #define png_sRGB_table sRGB_table
 #define png_sRGB_base sRGB_base
 #define png_sRGB_delta sRGB_delta
