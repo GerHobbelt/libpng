@@ -533,8 +533,8 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
       PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_fcTL(png_ptr, info_ptr, png_ptr->push_length);
    }
+#endif /* PNG_READ_APNG_SUPPORTED */
 
-#endif /* READ_APNG */
    else
    {
       PNG_PUSH_SAVE_BUFFER_IF_FULL
@@ -680,6 +680,7 @@ png_push_read_IDAT(png_structrp png_ptr)
 #ifdef PNG_READ_APNG_SUPPORTED
       if (png_ptr->chunk_name != png_fdAT && png_ptr->num_frames_read > 0)
       {
+          if (png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED)
           {
               png_ptr->process_mode = PNG_READ_CHUNK_MODE;
               if (png_ptr->frame_end_fn != NULL)
@@ -691,6 +692,7 @@ png_push_read_IDAT(png_structrp png_ptr)
           {
               if (png_ptr->chunk_name == png_IEND)
                   png_error(png_ptr, "Not enough image data");
+              if (png_ptr->push_length + 4 > png_ptr->buffer_size)
               {
                  png_push_save_buffer(png_ptr);
                  return;
@@ -808,7 +810,8 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
 
 #ifdef PNG_READ_APNG_SUPPORTED
    /* If the app is not APNG-aware, decode only the first frame */
-      png_ptr->num_frames_read > 0)
+   if ((png_ptr->apng_flags & PNG_APNG_APP) == 0
+       && png_ptr->num_frames_read > 0)
    {
      png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
      return;
