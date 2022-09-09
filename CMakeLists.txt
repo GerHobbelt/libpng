@@ -1,6 +1,6 @@
 # CMakeLists.txt
 
-# Copyright (c) 2018-2020 Cosmin Truta
+# Copyright (c) 2018-2022 Cosmin Truta
 # Copyright (c) 2007,2009-2018 Glenn Randers-Pehrson
 # Written by Christian Ehrlicher, 2007
 # Revised by Roger Lowman, 2009-2010

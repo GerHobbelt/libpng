@@ -1254,7 +1254,7 @@ png_get_acTL(png_structp png_ptr, png_infop info_ptr,
     png_debug1(1, "in %s retrieval function", "acTL");
 
     if (png_ptr != NULL && info_ptr != NULL &&
-        (info_ptr->valid & PNG_INFO_acTL) &&
+        (info_ptr->valid & PNG_INFO_acTL) != 0 &&
         num_frames != NULL && num_plays != NULL)
     {
         *num_frames = info_ptr->num_frames;
@@ -1295,7 +1295,7 @@ png_get_next_frame_fcTL(png_structp png_ptr, png_infop info_ptr,
     png_debug1(1, "in %s retrieval function", "fcTL");
 
     if (png_ptr != NULL && info_ptr != NULL &&
-        (info_ptr->valid & PNG_INFO_fcTL) &&
+        (info_ptr->valid & PNG_INFO_fcTL) != 0 &&
         width != NULL && height != NULL &&
         x_offset != NULL && y_offset != NULL &&
         delay_num != NULL && delay_den != NULL &&
