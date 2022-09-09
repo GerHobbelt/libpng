@@ -284,7 +284,7 @@ png_read_frame_head(png_structp png_ptr, png_infop info_ptr)
 
     png_debug(0, "Reading frame head");
 
-    if (!(png_ptr->mode & PNG_HAVE_acTL))
+    if ((png_ptr->mode & PNG_HAVE_acTL) == 0)
         png_error(png_ptr, "attempt to png_read_frame_head() but "
                            "no acTL present");
 
@@ -304,7 +304,7 @@ png_read_frame_head(png_structp png_ptr, png_infop info_ptr)
         if (png_ptr->chunk_name == png_IDAT)
         {
             /* discard trailing IDATs for the first frame */
-            if (have_chunk_after_DAT || png_ptr->num_frames_read > 1)
+            if (have_chunk_after_DAT != 0 || png_ptr->num_frames_read > 1)
                 png_error(png_ptr, "png_read_frame_head(): out of place IDAT");
             png_crc_finish(png_ptr, length);
         }
@@ -320,9 +320,9 @@ png_read_frame_head(png_structp png_ptr, png_infop info_ptr)
             png_ensure_sequence_number(png_ptr, length);
 
             /* discard trailing fdATs for frames other than the first */
-            if (!have_chunk_after_DAT && png_ptr->num_frames_read > 1)
+            if (have_chunk_after_DAT == 0 && png_ptr->num_frames_read > 1)
                 png_crc_finish(png_ptr, length - 4);
-            else if(png_ptr->mode & PNG_HAVE_fcTL)
+            else if (png_ptr->mode & PNG_HAVE_fcTL)
             {
                 png_ptr->idat_size = length - 4;
                 png_ptr->mode |= PNG_HAVE_IDAT;

@@ -1195,8 +1195,7 @@ png_set_acTL(png_structp png_ptr, png_infop info_ptr,
     if (num_plays > PNG_UINT_31_MAX)
     {
         png_warning(png_ptr,
-                    "Ignoring attempt to set acTL with num_plays "
-                    "> 2^31-1");
+                    "Ignoring attempt to set acTL with num_plays > 2^31-1");
         return (0);
     }
 
@@ -1231,8 +1230,8 @@ png_set_next_frame_fcTL(png_structp png_ptr, png_infop info_ptr,
 
     if (blend_op == PNG_BLEND_OP_OVER)
     {
-        if (!(png_ptr->color_type & PNG_COLOR_MASK_ALPHA) &&
-            !(png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)))
+        if ((png_ptr->color_type & PNG_COLOR_MASK_ALPHA) == 0 &&
+            png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) == 0)
         {
           png_warning(png_ptr, "PNG_BLEND_OP_OVER is meaningless "
                                "and wasteful for opaque images, ignored");
@@ -1262,16 +1261,16 @@ png_ensure_fcTL_is_valid(png_structp png_ptr,
     png_byte dispose_op, png_byte blend_op)
 {
     if (width == 0 || width > PNG_UINT_31_MAX)
-        png_error(png_ptr, "invalid width in fcTL (> 2^31-1)");
+        png_error(png_ptr, "invalid width in fcTL (0 or > 2^31-1)");
     if (height == 0 || height > PNG_UINT_31_MAX)
-        png_error(png_ptr, "invalid height in fcTL (> 2^31-1)");
+        png_error(png_ptr, "invalid height in fcTL (0 or > 2^31-1)");
     if (x_offset > PNG_UINT_31_MAX)
         png_error(png_ptr, "invalid x_offset in fcTL (> 2^31-1)");
     if (y_offset > PNG_UINT_31_MAX)
         png_error(png_ptr, "invalid y_offset in fcTL (> 2^31-1)");
     if (width + x_offset > png_ptr->first_frame_width ||
         height + y_offset > png_ptr->first_frame_height)
-        png_error(png_ptr, "dimensions of a frame are greater than"
+        png_error(png_ptr, "dimensions of a frame are greater than "
                            "the ones in IHDR");
 
     if (dispose_op != PNG_DISPOSE_OP_NONE &&
@@ -1296,7 +1295,7 @@ png_set_first_frame_is_hidden(png_structp png_ptr, png_infop info_ptr,
     if (png_ptr == NULL)
         return 0;
 
-    if (is_hidden)
+    if (is_hidden != 0)
         png_ptr->apng_flags |= PNG_FIRST_FRAME_HIDDEN;
     else
         png_ptr->apng_flags &= ~PNG_FIRST_FRAME_HIDDEN;

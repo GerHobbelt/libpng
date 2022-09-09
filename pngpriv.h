@@ -1706,6 +1706,49 @@ PNG_INTERNAL_FUNCTION(void,png_push_read_iTXt,(png_structrp png_ptr,
 
 #endif /* PROGRESSIVE_READ */
 
+#ifdef PNG_APNG_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_ensure_fcTL_is_valid,(png_structp png_ptr,
+   png_uint_32 width, png_uint_32 height,
+   png_uint_32 x_offset, png_uint_32 y_offset,
+   png_uint_16 delay_num, png_uint_16 delay_den,
+   png_byte dispose_op, png_byte blend_op),PNG_EMPTY);
+
+#ifdef PNG_READ_APNG_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_handle_acTL,(png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_handle_fcTL,(png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_handle_fdAT,(png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_have_info,(png_structp png_ptr,
+   png_infop info_ptr),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_ensure_sequence_number,(png_structp png_ptr,
+   png_uint_32 length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_reset,(png_structp png_ptr),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_reinit,(png_structp png_ptr,
+   png_infop info_ptr),PNG_EMPTY);
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_progressive_read_reset,(png_structp png_ptr),
+   PNG_EMPTY);
+#endif /* PNG_READ_APNG_SUPPORTED */
+#endif /* PNG_APNG_SUPPORTED */
+
+#ifdef PNG_WRITE_APNG_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_write_acTL,(png_structp png_ptr,
+   png_uint_32 num_frames, png_uint_32 num_plays),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_fcTL,(png_structp png_ptr,
+   png_uint_32 width, png_uint_32 height,
+   png_uint_32 x_offset, png_uint_32 y_offset,
+   png_uint_16 delay_num, png_uint_16 delay_den,
+   png_byte dispose_op, png_byte blend_op),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_fdAT,(png_structp png_ptr,
+   png_const_bytep data, size_t length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_reset,(png_structp png_ptr),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_reinit,(png_structp png_ptr,
+   png_infop info_ptr, png_uint_32 width, png_uint_32 height),PNG_EMPTY);
+#endif /* PNG_WRITE_APNG_SUPPORTED */
+#endif /* PNG_APNG_SUPPORTED */
+
 /* Added at libpng version 1.6.0 */
 #ifdef PNG_GAMMA_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_colorspace_set_gamma,(png_const_structrp png_ptr,
