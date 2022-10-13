@@ -10,12 +10,15 @@
 # Revised by Sam Serrels, 2017
 # Revised by Vadim Barkov, 2017
 # Revised by Vicky Pfau, 2018
-# Revised by Cameron Cawley, 2018
+# Revised by Cameron Cawley, 2018,2021
 # Revised by Kyle Bentley, 2018
 # Revised by David Callu, 2020
 # Revised by Steve Robinson, 2020
 # Revised by Simon Hausmann, 2020
 # Revised by Alex Gaynor, 2020
+# Revised by Owen Rudge, 2020
+# Revised by Gleb Mazovetskiy, 2021
+# Revised by Christopher Sean Morrison, 2022
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -29,9 +32,13 @@ enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 38)
+set(PNGLIB_REVISION 38)
+set(PNGLIB_SUBREVISION 0)
+#set(PNGLIB_SUBREVISION "git")
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
-set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
+set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_REVISION})
+set(PNGLIB_SHARED_SOVERSION ${PNGLIB_MAJOR}${PNGLIB_MINOR})
+set(PNGLIB_SHARED_VERSION ${PNGLIB_SHARED_SOVERSION}.${PNGLIB_REVISION}.${PNGLIB_SUBREVISION})
 
 include(GNUInstallDirs)
 
@@ -68,24 +75,32 @@ option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
 set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
 
-if(PNG_HARDWARE_OPTIMIZATIONS)
-
-# add the system processor to CMAKE_OSX_ARCHITECTURES if it hasn't been specified
-if("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "")
-  list(APPEND CMAKE_OSX_ARCHITECTURES ${CMAKE_SYSTEM_PROCESSOR})
+# CMake currently sets CMAKE_SYSTEM_PROCESSOR to one of x86_64 or arm64 on macOS,
+# based upon the OS architecture, not the target architecture. As such, we need
+# to check CMAKE_OSX_ARCHITECTURES to identify which hardware-specific flags to
+# enable. Note that this will fail if you attempt to build a universal binary in
+# a single CMake invocation.
+if (APPLE AND CMAKE_OSX_ARCHITECTURES)
+  set(TARGET_ARCH ${CMAKE_OSX_ARCHITECTURES})
+else()
+  set(TARGET_ARCH ${CMAKE_SYSTEM_PROCESSOR})
 endif()
 
+if(PNG_HARDWARE_OPTIMIZATIONS)
+
 # Set definitions and sources for ARM.
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
-  CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch32" OR
-  CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64" OR
-  "arm64" IN_LIST CMAKE_OSX_ARCHITECTURES)
-  set(PNG_ARM_NEON_POSSIBLE_VALUES detect check on off)
-  set(PNG_ARM_NEON "detect" CACHE STRING "Enable ARM NEON optimizations:
-     detect: (default) enable optimizations if they are supported by the compiler;
-     check: use the supplied file for a runtime check;
-     off: disable the optimizations;
-     on: turn on unconditionally.")
+if(TARGET_ARCH MATCHES "^arm" OR
+   TARGET_ARCH MATCHES "^aarch64")
+  if(TARGET_ARCH MATCHES "^arm64" OR
+     TARGET_ARCH MATCHES "^aarch64")
+    set(PNG_ARM_NEON_POSSIBLE_VALUES on off)
+    set(PNG_ARM_NEON "on"
+        CACHE STRING "Enable ARM NEON optimizations: on|off; on is default")
+  else()
+    set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
+    set(PNG_ARM_NEON "check"
+        CACHE STRING "Enable ARM NEON optimizations: check|on|off; check is default")
+  endif()
   set_property(CACHE PNG_ARM_NEON
                PROPERTY STRINGS ${PNG_ARM_NEON_POSSIBLE_VALUES})
   list(FIND PNG_ARM_NEON_POSSIBLE_VALUES ${PNG_ARM_NEON} index)
@@ -108,8 +123,8 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
 endif()
 
 # Set definitions and sources for PowerPC.
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^powerpc*" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc64*")
+if(TARGET_ARCH MATCHES "^powerpc*" OR
+   TARGET_ARCH MATCHES "^ppc64*")
   set(PNG_POWERPC_VSX_POSSIBLE_VALUES on off)
   set(PNG_POWERPC_VSX "on"
       CACHE STRING "Enable POWERPC VSX optimizations: on|off; on is default")
@@ -131,8 +146,8 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^powerpc*" OR
 endif()
 
 # Set definitions and sources for Intel.
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+if(TARGET_ARCH MATCHES "^i?86" OR
+   TARGET_ARCH MATCHES "^x86_64*")
   set(PNG_INTEL_SSE_POSSIBLE_VALUES on off)
   set(PNG_INTEL_SSE "on"
       CACHE STRING "Enable INTEL_SSE optimizations: on|off; on is default")
@@ -154,8 +169,8 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
 endif()
 
 # Set definitions and sources for MIPS.
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "mips64el*")
+if(TARGET_ARCH MATCHES "mipsel*" OR
+   TARGET_ARCH MATCHES "mips64el*")
   set(PNG_MIPS_MSA_POSSIBLE_VALUES on off)
   set(PNG_MIPS_MSA "on"
       CACHE STRING "Enable MIPS_MSA optimizations: on|off; on is default")
@@ -179,27 +194,26 @@ endif()
 else(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64" OR
-   "arm64" IN_LIST CMAKE_OSX_ARCHITECTURES)
+if(TARGET_ARCH MATCHES "^arm" OR
+   TARGET_ARCH MATCHES "^aarch64")
   add_definitions(-DPNG_ARM_NEON_OPT=0)
 endif()
 
 # Set definitions and sources for PowerPC.
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^powerpc*" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc64*")
+if(TARGET_ARCH MATCHES "^powerpc*" OR
+   TARGET_ARCH MATCHES "^ppc64*")
   add_definitions(-DPNG_POWERPC_VSX_OPT=0)
 endif()
 
 # Set definitions and sources for Intel.
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+if(TARGET_ARCH MATCHES "^i?86" OR
+   TARGET_ARCH MATCHES "^x86_64*")
   add_definitions(-DPNG_INTEL_SSE_OPT=0)
 endif()
 
 # Set definitions and sources for MIPS.
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "mips64el*")
+if(TARGET_ARCH MATCHES "mipsel*" OR
+   TARGET_ARCH MATCHES "mips64el*")
   add_definitions(-DPNG_MIPS_MSA_OPT=0)
 endif()
 
@@ -213,9 +227,10 @@ set(CMAKE_DEBUG_POSTFIX "d")
 
 include(CheckCSourceCompiles)
 option(ld-version-script "Enable linker version script" ON)
-if(ld-version-script AND NOT APPLE)
+if(ld-version-script AND NOT ANDROID AND NOT APPLE)
   # Check if LD supports linker scripts.
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map" "VERS_1 {
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map" "
+VERS_1 {
         global: sym;
         local: *;
 };
@@ -292,6 +307,20 @@ if(NOT AWK OR ANDROID OR IOS)
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
   add_custom_target(genfiles) # Dummy
 else()
+  # Copy the awk scripts, converting their line endings to Unix (LF)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk
+                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/checksym.awk
+                 @ONLY
+                 NEWLINE_STYLE LF)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/options.awk
+                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/options.awk
+                 @ONLY
+                 NEWLINE_STYLE LF)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/dfn.awk
+                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/dfn.awk
+                 @ONLY
+                 NEWLINE_STYLE LF)
+
   # Generate .chk from .out with awk:
   # generate_chk(INPUT inputfile OUTPUT outputfile [DEPENDS dep1 [dep2...]])
   include(CMakeParseArguments)
@@ -359,26 +388,33 @@ else()
   endfunction()
 
   # Copy file
-  function(generate_copy source destination)
-    add_custom_command(OUTPUT "${destination}"
+  # generate_copy(INPUT inputfile OUTPUT outputfile [DEPENDS dep1 [dep2...]])
+  function(generate_copy)
+    set(options)
+    set(oneValueArgs INPUT OUTPUT)
+    set(multiValueArgs DEPENDS)
+    cmake_parse_arguments(_GCO "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    add_custom_command(OUTPUT "${_GCO_OUTPUT}"
                        COMMAND "${CMAKE_COMMAND}"
-                               -E remove "${destination}"
+                               -E remove "${_GCO_OUTPUT}"
                        COMMAND "${CMAKE_COMMAND}"
-                               -E copy "${source}" "${destination}"
-                       DEPENDS "${source}")
+                               -E copy "${_GCO_INPUT}" "${_GCO_OUTPUT}"
+                       DEPENDS "${source}" ${_GCO_DEPENDS})
   endfunction()
 
   # Generate scripts/pnglibconf.h
   generate_source(OUTPUT "scripts/pnglibconf.c"
                   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.dfa"
-                          "${CMAKE_CURRENT_SOURCE_DIR}/scripts/options.awk"
+                          "${CMAKE_CURRENT_BINARY_DIR}/scripts/options.awk"
                           "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
+  add_custom_target(scripts_pnglibconf_c DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf.c")
 
   # Generate pnglibconf.c
   generate_source(OUTPUT "pnglibconf.c"
                   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.dfa"
-                          "${CMAKE_CURRENT_SOURCE_DIR}/scripts/options.awk"
+                          "${CMAKE_CURRENT_BINARY_DIR}/scripts/options.awk"
                           "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
+  add_custom_target(pnglibconf_c DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.c")
 
   if(PNG_PREFIX)
     set(PNGLIBCONF_H_EXTRA_DEPENDS
@@ -389,52 +425,72 @@ else()
   endif()
 
   generate_out(INPUT "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.c"
-               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out")
+               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out"
+               DEPENDS pnglibconf_c)
+  add_custom_target(pnglibconf_out DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out")
 
   # Generate pnglibconf.h
   generate_source(OUTPUT "pnglibconf.h"
-                  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out"
+                  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out" pnglibconf_out
                           ${PNGLIBCONF_H_EXTRA_DEPENDS})
+  add_custom_target(pnglibconf_h DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h")
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/intprefix.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out"
-               DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h")
+               DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h" pnglibconf_h)
+  add_custom_target(scripts_intprefix_out DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out")
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/prefix.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out"
                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/png.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
-                       "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out")
+                       "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out" pnglibconf_out)
+  add_custom_target(scripts_prefix_out DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out")
 
   # Generate pngprefix.h
   generate_source(OUTPUT "pngprefix.h"
                   DEPENDS ${PNGPREFIX_H_EXTRA_DEPENDS})
+  add_custom_target(pngprefix_h DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/sym.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out"
-               DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h")
+               DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h" pnglibconf_h)
+  add_custom_target(scripts_sym_out DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out")
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/symbols.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/png.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt")
+  add_custom_target(scripts_symbols_out DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out")
 
   generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/vers.c"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out"
                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/png.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
-                       "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h")
+                       "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h" pnglibconf_h)
+  add_custom_target(scripts_vers_out DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out")
 
   generate_chk(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk"
-               DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk"
+               DEPENDS scripts_symbols_out
+                       "${CMAKE_CURRENT_BINARY_DIR}/scripts/checksym.awk"
                        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/symbols.def")
 
-  generate_copy("${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out"
-                "${CMAKE_CURRENT_BINARY_DIR}/libpng.sym")
-  generate_copy("${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out"
-                "${CMAKE_CURRENT_BINARY_DIR}/libpng.vers")
+  add_custom_target(scripts_symbols_chk
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk")
+
+  generate_copy(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out"
+                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/libpng.sym"
+                DEPENDS scripts_sym_out)
+  generate_copy(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out"
+                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/libpng.vers"
+                DEPENDS scripts_vers_out)
+
+  add_custom_target(genvers
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/libpng.vers")
+  add_custom_target(gensym
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/libpng.sym")
 
   add_custom_target("genprebuilt"
                     COMMAND "${CMAKE_COMMAND}"
@@ -443,23 +499,20 @@ else()
                     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
   # A single target handles generation of all generated files.
-  # If they are depended upon separately by multiple targets, this
-  # confuses parallel make (it would require a separate top-level
-  # target for each file to track the dependencies properly).
   add_custom_target(genfiles
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/libpng.sym"
-                            "${CMAKE_CURRENT_BINARY_DIR}/libpng.vers"
-                            "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.c"
-                            "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h"
-                            "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out"
-                            "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h"
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out"
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf.c"
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out"
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out"
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk"
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out")
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/libpng.sym" gensym
+                            "${CMAKE_CURRENT_BINARY_DIR}/libpng.vers" genvers
+                            "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.c" pnglibconf_c
+                            "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h" pnglibconf_h
+                            "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out" pnglibconf_out
+                            "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h" pngprefix_h
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out" scripts_intprefix_out
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf.c" scripts_pnglibconf_c
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out" scripts_prefix_out
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out" scripts_sym_out
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk" scripts_symbols_chk
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out" scripts_symbols_out
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out" scripts_vers_out)
 endif(NOT AWK OR ANDROID OR IOS)
 
 # List the source code files.
@@ -918,6 +971,14 @@ else()
     STRING(REPLACE "Requires.private: zlib" "Requires.private:" png_pc_out ${png_pc_out})
     FILE(WRITE ${pc_file} ${png_pc_out})
   endforeach()
+endif()
+
+# Set up links.
+if(PNG_SHARED)
+  set_target_properties(png PROPERTIES
+    VERSION ${PNGLIB_SHARED_VERSION}
+    SOVERSION ${PNGLIB_SHARED_SOVERSION}
+    CLEAN_DIRECT_OUTPUT 1)
 endif()
 
 # Install.

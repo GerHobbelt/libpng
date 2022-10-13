@@ -1,5 +1,5 @@
 # makefile for libpng
-# Copyright (C) 2020 Cosmin Truta
+# Copyright (C) 2020-2022 Cosmin Truta
 # Copyright (C) 2002, 2006, 2014 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
@@ -32,20 +32,21 @@ CC = cc
 CPP = $(CC) -E
 LD = $(CC)
 AR_RC = ar rc
+RANLIB = ranlib
 MKDIR_P = mkdir
 LN_SF = ln -sf
-RANLIB = ranlib
 CP = cp
+MV_F = mv -f
 RM_F = rm -f
 AWK = awk
-SED = sed
-ECHO = echo
 
+NOHWOPT = -DPNG_ARM_NEON_OPT=0 -DPNG_MIPS_MSA_OPT=0 \
+	-DPNG_POWERPC_VSX_OPT=0 -DPNG_INTEL_SSE_OPT=0
 DFNFLAGS = # DFNFLAGS contains -D options to use in the libpng build
 DFA_EXTRA = # extra files that can be used to control configuration
-CPPFLAGS = -I$(ZLIBINC) # -DPNG_DEBUG=5
+CPPFLAGS = -I$(ZLIBINC) $(NOHWOPT) # -DPNG_DEBUG=5
 CFLAGS = -O # -g
-LDFLAGS = -L$(ZLIBLIB)
+LDFLAGS = -L$(ZLIBLIB) # -g
 LIBS = -lz -lm
 
 # Pre-built configuration
@@ -65,21 +66,21 @@ all: libpng.a pngtest
 # copy this if the following doesn't work.
 pnglibconf.h: pnglibconf.dfn
 	$(RM_F) $@ pnglibconf.c pnglibconf.out pnglibconf.tmp
-	$(ECHO) '#include "pnglibconf.dfn"' >pnglibconf.c
-	$(ECHO) "If '$(CC) -E' crashes try /lib/cpp (e.g. CPP='/lib/cpp')" >&2
+	echo '#include "pnglibconf.dfn"' >pnglibconf.c
+	@echo "## If '$(CC) -E' fails, try /lib/cpp (e.g. CPP='/lib/cpp')" >&2
 	$(CPP) $(DFNFLAGS) pnglibconf.c >pnglibconf.out
-	$(AWK) -f "scripts/dfn.awk" out="pnglibconf.tmp" pnglibconf.out 1>&2
-	mv pnglibconf.tmp $@
+	$(AWK) -f scripts/dfn.awk out=pnglibconf.tmp pnglibconf.out >&2
+	$(MV_F) pnglibconf.tmp $@
 
 pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
 	$(RM_F) $@ pnglibconf.pre pnglibconf.tmp
-	$(ECHO) "Calling $(AWK) from scripts/pnglibconf.mak" >&2
-	$(ECHO) "If 'awk' crashes try a better awk (e.g. AWK='nawk')" >&2
-	$(AWK) -f scripts/options.awk out="pnglibconf.pre"\
+	@echo "## Calling $(AWK) from scripts/pnglibconf.mak" >&2
+	@echo "## If 'awk' fails, try a better awk (e.g. AWK='nawk')" >&2
+	$(AWK) -f scripts/options.awk out=pnglibconf.pre\
 	    version=search pngconf.h scripts/pnglibconf.dfa\
-	    pngusr.dfa $(DFA_XTRA) 1>&2
-	$(AWK) -f scripts/options.awk out="pnglibconf.tmp" pnglibconf.pre 1>&2
-	mv pnglibconf.tmp $@
+	    pngusr.dfa $(DFA_XTRA) >&2
+	$(AWK) -f scripts/options.awk out=pnglibconf.tmp pnglibconf.pre >&2
+	$(MV_F) pnglibconf.tmp $@
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)

@@ -1884,7 +1884,7 @@ int main(int argc, const char** argv)
          }
    }
 
-   /* small and colors are incomparible (will probably crash if both are used at
+   /* small and colors are incompatible (will probably crash if both are used at
     * the same time!)
     */
    if (small && colors[0] != 0)

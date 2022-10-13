@@ -20,7 +20,9 @@ Authors, for copyright and licensing purposes.
  * Mans Rullgard
  * Matt Sarett
  * Mike Klein
+ * Pascal Massimino
  * Paul Schmidt
+ * Qiang Zhou
  * Sam Bushell
  * Samuel Williams
  * Simon-Pierre Cadieux
@@ -36,6 +38,7 @@ Authors, for copyright and licensing purposes.
    - Matt Sarett
    - Mike Klein
    - Dan Field
+   - Sami Boukortt
 
 The build projects, the build scripts, the test scripts, and other
 files in the "ci", "projects", "scripts" and "tests" directories, have
