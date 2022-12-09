@@ -2291,4 +2291,4 @@ int main(int argc, const char** argv)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_39 Your_png_h_is_not_version_1_6_39;
+typedef png_libpng_version_1_6_40_git Your_png_h_is_not_version_1_6_40_git;
