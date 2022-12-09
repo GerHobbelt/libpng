@@ -1,6 +1,5 @@
 /* pngfix.c
  *
- * Last changed in libpng 1.6.31 [July 27, 2017]
  * Copyright (c) 2014-2017 John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -10,6 +9,7 @@
  * Tool to check and fix the zlib inflate 'too far back' problem.
  * See the usage message for more information.
  */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -3968,9 +3968,10 @@ int main(int argc, const char** argv)
       {
          size_t outlen = strlen(*argv);
 
-         if ( outlen > FILENAME_MAX ) {
+         if (outlen > FILENAME_MAX)
+         {
             fprintf(stderr, "%s: output file name too long: %s%s%s\n",
-              prog, prefix, *argv, suffix ? suffix : "");
+               prog, prefix, *argv, suffix ? suffix : "");
             global.status_code |= WRITE_ERROR;
             continue;
          }
@@ -4070,4 +4071,3 @@ int main(int argc, const char** argv)
 }
 
 #endif /* PNG_SETJMP_SUPPORTED */
-
