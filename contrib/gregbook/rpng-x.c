@@ -81,6 +81,8 @@
 
   ---------------------------------------------------------------------------*/
 
+#ifndef _WIN32
+
 #define PROGNAME  "rpng-x"
 #define LONGNAME  "Simple PNG Viewer for X"
 #define VERSION   "2.02 of 15 June 2014"
@@ -909,3 +911,5 @@ static int rpng_x_msb(ulg u32val)
     }
     return i;
 }
+
+#endif // _WIN32

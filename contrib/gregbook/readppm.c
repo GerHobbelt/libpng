@@ -83,7 +83,6 @@ int readpng_init(FILE *infile, ulg *pWidth, ulg *pHeight)
     static uch ppmline[256];
     int maxval;
 
-
     saved_infile = infile;
 
     fgets(ppmline, 256, infile);
@@ -158,7 +157,7 @@ uch *readpng_get_image(double display_exponent, int *pChannels, ulg *pRowbytes)
 
     /* Guard against integer overflow */
     if (height > ((size_t)(-1))/rowbytes) {
-        fprintf(stderr, PROGNAME ":  image_data buffer would be too large\n",
+		fprintf(stderr, "ERROR: image_data buffer would be too large\n");
         return NULL;
     }
 

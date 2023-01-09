@@ -73,8 +73,10 @@
 #include <limits.h>
 #include <assert.h>
 
+#if !defined(_WIN32)
 #include <unistd.h>
 #include <sys/stat.h>
+#endif
 
 #include <zlib-ng.h>
 
