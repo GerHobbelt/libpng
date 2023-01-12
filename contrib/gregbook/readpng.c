@@ -55,7 +55,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <zlib.h>
+#include <zlib-ng.h>
 
 #include "png.h"        /* libpng header */
 #include "readpng.h"    /* typedefs, common macros, public prototypes */
@@ -79,7 +79,7 @@ void readpng_version_info(void)
     fprintf(stderr, "   Compiled with libpng %s; using libpng %s.\n",
       PNG_LIBPNG_VER_STRING, png_libpng_ver);
     fprintf(stderr, "   Compiled with zlib %s; using zlib %s.\n",
-      ZLIB_VERSION, zlib_version);
+      ZLIBNG_VERSION, zlibng_version());
 }
 
 
@@ -266,7 +266,7 @@ uch *readpng_get_image(double display_exponent, int *pChannels, ulg *pRowbytes)
 
     /* Guard against integer overflow */
     if (height > ((size_t)(-1))/rowbytes) {
-        fprintf(stderr, "readpng:  image_data buffer would be too large\n",
+		fprintf(stderr, "readpng:  image_data buffer would be too large\n");
         return NULL;
     }
 

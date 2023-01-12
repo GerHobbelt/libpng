@@ -86,7 +86,7 @@ void readpng2_version_info(void)
       PNG_LIBPNG_VER_STRING, png_libpng_ver);
 
     fprintf(stderr, "   and with zlib %s; using zlib %s.\n",
-      ZLIBNG_VERSION, zlibng_version);
+      ZLIBNG_VERSION, zlibng_version());
 }
 
 
