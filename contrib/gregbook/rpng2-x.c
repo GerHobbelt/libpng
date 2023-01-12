@@ -97,6 +97,8 @@
 
   ---------------------------------------------------------------------------*/
 
+#if !defined(_WIN32)
+
 #define PROGNAME  "rpng2-x"
 #define LONGNAME  "Progressive PNG Viewer for X"
 #define VERSION   "2.04 of 15 June 2014"
@@ -2141,3 +2143,5 @@ static int rpng2_x_msb(ulg u32val)
     }
     return i;
 }
+
+#endif

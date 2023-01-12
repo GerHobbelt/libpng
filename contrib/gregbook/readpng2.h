@@ -64,9 +64,9 @@
 #endif
 
 #ifdef DEBUG
-#  define Trace(x)  {fprintf x ; fflush(stderr); fflush(stdout);}
+#  define Trace(x)  do {fprintf x ; fflush(stderr); fflush(stdout);} while (0)
 #else
-#  define Trace(x)  ;
+#  define Trace(x)  
 #endif
 
 enum rpng2_states {

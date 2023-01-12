@@ -236,7 +236,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
             free (pbImageData);
             pbImageData = NULL;
         }
-        if ((*piHeight) > ((size_t)(-1))/ulRowBytes) {
+        if ((*piHeight) > ((size_t)(-1))/ulRowBytes)
         {
             png_error(png_ptr, "Visual PNG: image is too big");
         }

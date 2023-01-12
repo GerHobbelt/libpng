@@ -76,6 +76,9 @@
 #if !defined(_WIN32)
 #include <unistd.h>
 #include <sys/stat.h>
+#else
+#include <io.h>
+#include <sys/stat.h>
 #endif
 
 #include <zlib-ng.h>

@@ -80,7 +80,7 @@ void readpng_version_info()
 
 int readpng_init(FILE *infile, ulg *pWidth, ulg *pHeight)
 {
-    static uch ppmline[256];
+    static char ppmline[256];
     int maxval;
 
     saved_infile = infile;
@@ -105,7 +105,13 @@ int readpng_init(FILE *infile, ulg *pWidth, ulg *pHeight)
     do {
         fgets(ppmline, 256, infile);
     } while (ppmline[0] == '#');
-    sscanf(ppmline, "%lu %lu", &width, &height);
+	width = 0;
+	height = 0;
+    int vc = sscanf(ppmline, "%lu %lu", &width, &height);
+	if (vc != 2 || !width || !height) {
+		fprintf(stderr, "ERROR:  invalid width/height specification in '%s'\n", ppmline);
+		return 2;
+	}
 
     do {
         fgets(ppmline, 256, infile);

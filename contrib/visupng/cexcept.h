@@ -214,10 +214,10 @@ struct exception_context { \
     exception__prev = the_exception_context->penv; \
     the_exception_context->penv = &exception__env; \
     if (setjmp(exception__env) == 0) { \
-      do
+      do {
 
 #define exception__catch(action) \
-      while (the_exception_context->caught = 0, \
+      } while (the_exception_context->caught = 0, \
              the_exception_context->caught); \
     } \
     else { \
