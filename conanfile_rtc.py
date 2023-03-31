@@ -3,7 +3,7 @@ from conans import ConanFile
 
 class PngConan(ConanFile):
     name = "png"
-    version = "1.6.37"
+    version = "1.6.39"
     url = "https://github.com/Esri/libpng/tree/runtimecore"
     license = "https://github.com/Esri/libpng/blob/runtimecore/LICENSE"
     description = "Open, Extensible Image Format with Lossless Compression."
