@@ -54,6 +54,11 @@ if ("${INPUTEXT}" STREQUAL ".c" AND "${OUTPUTEXT}" STREQUAL ".out")
     endforeach()
   endif()
 
+  if(NOT "x@YOUI_EXTRA_INCLUDE_DIR@" STREQUAL "x")
+    string(REPLACE ":" ";" YOUI_EXTRA_INCLUDE_DIR "@YOUI_EXTRA_INCLUDE_DIR@")
+    list(APPEND INCLUDES ${YOUI_EXTRA_INCLUDE_DIR})
+  endif()
+
   if(PNG_PREFIX)
     set(PNG_PREFIX_DEF "-DPNG_PREFIX=${PNG_PREFIX}")
   endif()
