@@ -1,6 +1,6 @@
 # configure.ac
 
-# Copyright (c) 2018-2022 Cosmin Truta
+# Copyright (c) 2018-2023 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
 
 # This code is released under the libpng license.
@@ -88,6 +88,24 @@ fi
 # necessary to use a different preprocessor for .dfn files
 DFNCPP="$CPP"
 AC_SUBST(DFNCPP)
+
+AC_ARG_ENABLE([tests],
+   AS_HELP_STRING([--disable-tests],
+      [do not build the test programs (default is to build)]),
+      [enable_tests="$enableval"],
+      [enable_tests=yes])
+
+AM_CONDITIONAL([ENABLE_TESTS],
+   [test "$enable_tests" != "no"])
+
+AC_ARG_ENABLE([tools],
+   AS_HELP_STRING([--disable-tools],
+      [do not build the auxiliary tools (default is to build)]),
+      [enable_tools="$enableval"],
+      [enable_tools=yes])
+
+AM_CONDITIONAL([ENABLE_TOOLS],
+   [test "$enable_tools" != "no"])
 
 # -Werror cannot be passed to GCC in CFLAGS because configure will fail
 # (it checks the compiler with a program that generates a warning).

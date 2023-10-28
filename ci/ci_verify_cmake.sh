@@ -16,16 +16,17 @@ cd "$CI_TOPLEVEL_DIR"
 
 CI_SRC_DIR="$CI_TOPLEVEL_DIR"
 CI_OUT_DIR="$CI_TOPLEVEL_DIR/out"
-CI_BUILD_DIR="$CI_OUT_DIR/ci_verify_cmake.$CI_TARGET_SYSTEM.$CI_TARGET_MACHINE.build"
-CI_INSTALL_DIR="$CI_OUT_DIR/ci_verify_cmake.$CI_TARGET_SYSTEM.$CI_TARGET_MACHINE.install"
+CI_BUILD_DIR="$CI_OUT_DIR/ci_verify_cmake.$CI_TARGET_SYSTEM.$CI_TARGET_ARCH.build"
+CI_INSTALL_DIR="$CI_OUT_DIR/ci_verify_cmake.$CI_TARGET_SYSTEM.$CI_TARGET_ARCH.install"
 
 # Keep the following relative paths in sync with the absolute paths.
 # We use them for the benefit of native Windows tools that might be
 # otherwise confused by the path encoding used by Bash-on-Windows.
 CI_BUILD_TO_SRC_RELDIR="../.."
-CI_BUILD_TO_INSTALL_RELDIR="../ci_verify_cmake.install"
+CI_BUILD_TO_INSTALL_RELDIR="../ci_verify_cmake.$CI_TARGET_SYSTEM.$CI_TARGET_ARCH.install"
 
 function ci_init_build {
+    # Ensure that the mandatory variables are initialized.
     CI_CMAKE="${CI_CMAKE:-cmake}"
     CI_CTEST="${CI_CTEST:-ctest}"
     CI_CMAKE_BUILD_TYPE="${CI_CMAKE_BUILD_TYPE:-Release}"
@@ -39,18 +40,18 @@ function ci_init_build {
         [[ $TMP && ( $Tmp || $tmp ) ]] && unset TMP
         # Ensure that CI_CMAKE_GENERATOR_PLATFORM is initialized for this generator.
         [[ $CI_CMAKE_GENERATOR_PLATFORM ]] ||
-            ci_err "missing: \$CI_CMAKE_GENERATOR_PLATFORM"
+            ci_err_internal "missing \$CI_CMAKE_GENERATOR_PLATFORM"
     fi
 }
 
 function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
-    ci_info "host system: $CI_HOST_SYSTEM"
-    ci_info "host machine hardware: $CI_HOST_MACHINE"
-    [[ "$CI_TARGET_SYSTEM" != "$CI_HOST_SYSTEM" ]] &&
+    ci_info "build arch: $CI_BUILD_ARCH"
+    ci_info "build system: $CI_BUILD_SYSTEM"
+    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_BUILD_SYSTEM.$CI_BUILD_ARCH" ]] && {
+        ci_info "target arch: $CI_TARGET_ARCH"
         ci_info "target system: $CI_TARGET_SYSTEM"
-    [[ "$CI_TARGET_MACHINE" != "$CI_HOST_MACHINE" ]] &&
-        ci_info "target machine hardware: $CI_TARGET_MACHINE"
+    }
     ci_info "source directory: $CI_SRC_DIR"
     ci_info "build directory: $CI_BUILD_DIR"
     ci_info "install directory: $CI_INSTALL_DIR"
@@ -110,14 +111,16 @@ function ci_build {
         ALL_CMAKE_VARS+=(-DCMAKE_C_COMPILER="$CI_CC")
     [[ $ALL_CC_FLAGS ]] &&
         ALL_CMAKE_VARS+=(-DCMAKE_C_FLAGS="$ALL_CC_FLAGS")
-    [[ $CI_AR ]] &&
-        ALL_CMAKE_VARS+=(-DCMAKE_AR="$CI_AR")
-    [[ $CI_RANLIB ]] &&
-        ALL_CMAKE_VARS+=(-DCMAKE_RANLIB="$CI_RANLIB")
+    [[ $CI_AR ]] && {
+        # Use the full path of CI_AR to work around a CMake error.
+        ALL_CMAKE_VARS+=(-DCMAKE_AR="$(command -v "$CI_AR")")
+    }
+    [[ $CI_RANLIB ]] && {
+        # Use the full path of CI_RANLIB to work around a CMake error.
+        ALL_CMAKE_VARS+=(-DCMAKE_RANLIB="$(command -v "$CI_RANLIB")")
+    }
     ALL_CMAKE_VARS+=(-DCMAKE_BUILD_TYPE="$CI_CMAKE_BUILD_TYPE")
     ALL_CMAKE_VARS+=(-DCMAKE_VERBOSE_MAKEFILE=ON)
-    [[ $CI_NO_TEST ]] &&
-        ALL_CMAKE_VARS+=(-DPNG_TESTS=OFF)
     ALL_CMAKE_VARS+=($CI_CMAKE_VARS)
     local ALL_CMAKE_BUILD_FLAGS=($CI_CMAKE_BUILD_FLAGS)
     local ALL_CTEST_FLAGS=($CI_CTEST_FLAGS)
@@ -126,43 +129,53 @@ function ci_build {
         ci_spawn export CMAKE_GENERATOR="$CI_CMAKE_GENERATOR"
     [[ $CI_CMAKE_GENERATOR_PLATFORM ]] &&
         ci_spawn export CMAKE_GENERATOR_PLATFORM="$CI_CMAKE_GENERATOR_PLATFORM"
-    # Build and install.
+    # Build!
     # Use $CI_BUILD_TO_SRC_RELDIR and $CI_BUILD_TO_INSTALL_RELDIR
     # instead of $CI_SRC_DIR and $CI_INSTALL_DIR from this point onwards.
     ci_spawn mkdir -p "$CI_BUILD_DIR"
     ci_spawn cd "$CI_BUILD_DIR"
-    ci_assert "$CI_SRC_DIR" -ef "$CI_BUILD_TO_SRC_RELDIR"
+    [[ $CI_BUILD_TO_SRC_RELDIR -ef $CI_SRC_DIR ]] ||
+        ci_err_internal "bad or missing \$CI_BUILD_TO_SRC_RELDIR"
     ci_spawn mkdir -p "$CI_INSTALL_DIR"
-    ci_assert "$CI_INSTALL_DIR" -ef "$CI_BUILD_TO_INSTALL_RELDIR"
+    [[ $CI_BUILD_TO_INSTALL_RELDIR -ef $CI_INSTALL_DIR ]] ||
+        ci_err_internal "bad or missing \$CI_BUILD_TO_INSTALL_RELDIR"
+    # Spawn "cmake ...".
     ci_spawn "$CI_CMAKE" -DCMAKE_INSTALL_PREFIX="$CI_BUILD_TO_INSTALL_RELDIR" \
                          "${ALL_CMAKE_VARS[@]}" \
                          "$CI_BUILD_TO_SRC_RELDIR"
+    # Spawn "cmake --build ...".
     ci_spawn "$CI_CMAKE" --build . \
                          --config "$CI_CMAKE_BUILD_TYPE" \
                          "${ALL_CMAKE_BUILD_FLAGS[@]}"
-    [[ $CI_NO_TEST ]] ||
+    ci_expr $((CI_NO_TEST)) || {
+        # Spawn "ctest" if testing is not disabled.
         ci_spawn "$CI_CTEST" --build-config "$CI_CMAKE_BUILD_TYPE" \
                              "${ALL_CTEST_FLAGS[@]}"
-    [[ $CI_NO_INSTALL ]] ||
+    }
+    ci_expr $((CI_NO_INSTALL)) || {
+        # Spawn "cmake --build ... --target install" if installation is not disabled.
         ci_spawn "$CI_CMAKE" --build . \
                              --config "$CI_CMAKE_BUILD_TYPE" \
                              --target install \
                              "${ALL_CMAKE_BUILD_FLAGS[@]}"
-    [[ $CI_NO_CLEAN ]] ||
+    }
+    ci_expr $((CI_NO_CLEAN)) || {
+        # Spawn "make --build ... --target clean" if cleaning is not disabled.
         ci_spawn "$CI_CMAKE" --build . \
                              --config "$CI_CMAKE_BUILD_TYPE" \
                              --target clean \
                              "${ALL_CMAKE_BUILD_FLAGS[@]}"
+    }
     ci_info "## END OF BUILD ##"
 }
 
 function main {
-    [[ $# -eq 0 ]] || {
-        ci_info "note: this program accepts environment options only"
-        ci_err "unsupported command argument: '$1'"
-    }
     ci_init_build
     ci_trace_build
+    [[ $# -eq 0 ]] || {
+        ci_info "note: this program accepts environment options only (see above)"
+        ci_err "unexpected command argument: '$1'"
+    }
     ci_cleanup_old_build
     ci_build
 }
