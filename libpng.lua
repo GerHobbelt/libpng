@@ -10,7 +10,7 @@ flags { "NoPCH" }
 
 includedirs {
   "libpng",
-  _3RDPARTY_DIR .. "/zlib",
+  _3RDPARTY_DIR .. "/zlib-ng",
 }
 
 defines {
