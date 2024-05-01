@@ -518,7 +518,6 @@
 #  include <float.h>
 
 #  include <math.h>
-
 #  if defined(_AMIGA) && defined(__SASC) && defined(_M68881)
    /* Amiga SAS/C: We must include builtin FPU functions when compiling using
     * MATH=68881
