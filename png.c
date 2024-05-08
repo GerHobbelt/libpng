@@ -2564,7 +2564,7 @@ png_check_IHDR(png_const_structrp png_ptr,
       error = 1;
    }
 
-   if (png_gt(((width + 7) & (~7U)),
+   if (png_gt((((size_t)width + 7) & (~7U)),
        ((PNG_SIZE_MAX
            - 48        /* big_row_buf hack */
            - 1)        /* filter byte */
