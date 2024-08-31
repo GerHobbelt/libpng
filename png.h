@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.41.git
+ * libpng version 1.6.41
  *
  * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
@@ -15,7 +15,7 @@
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
  *   libpng versions 0.97, January 1998, through 1.6.35, July 2018:
  *     Glenn Randers-Pehrson
- *   libpng versions 1.6.36, December 2018, through 1.6.40, June 2023:
+ *   libpng versions 1.6.36, December 2018, through 1.6.41, January 2024:
  *     Cosmin Truta
  *   See also "Contributing Authors", below.
  */
@@ -254,7 +254,7 @@
  *    ...
  *    1.5.30                  15    10530  15.so.15.30[.0]
  *    ...
- *    1.6.40                  16    10640  16.so.16.40[.0]
+ *    1.6.41                  16    10641  16.so.16.41[.0]
  *
  *    Henceforth the source version will match the shared-library major and
  *    minor numbers; the shared-library major version number will be used for
@@ -350,8 +350,8 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.41.git"
-#define PNG_HEADER_VERSION_STRING " libpng version 1.6.41.git\n"
+#define PNG_LIBPNG_VER_STRING "1.6.41"
+#define PNG_HEADER_VERSION_STRING " libpng version " PNG_LIBPNG_VER_STRING "\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -364,7 +364,7 @@
 /* This should be zero for a public release, or non-zero for a
  * development version.  [Deprecated]
  */
-#define PNG_LIBPNG_VER_BUILD  1
+#define PNG_LIBPNG_VER_BUILD  0
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -381,7 +381,7 @@
 #define PNG_LIBPNG_BUILD_SPECIAL 32 /* Cannot be OR'ed with
                                        PNG_LIBPNG_BUILD_PRIVATE */
 
-#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_BETA
+#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_STABLE
 
 /* Careful here.  At one time, Guy wanted to use 082, but that
  * would be octal.  We must not include leading zeros.
@@ -390,7 +390,7 @@
  * From version 1.0.1 it is:
  * XXYYZZ, where XX=major, YY=minor, ZZ=release
  */
-#define PNG_LIBPNG_VER 10641 /* 1.6.41.git */
+#define PNG_LIBPNG_VER 10641 /* 1.6.41 */
 
 /* Library configuration: these options cannot be changed after
  * the library has been built.
@@ -515,7 +515,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_41_git;
+typedef char* png_libpng_version_1_6_41;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
@@ -1003,15 +1003,15 @@ PNG_EXPORT(2, void, png_set_sig_bytes, (png_structrp png_ptr, int num_bytes));
 /* Check sig[start] through sig[start + num_to_check - 1] to see if it's a
  * PNG file.  Returns zero if the supplied bytes match the 8-byte PNG
  * signature, and non-zero otherwise.  Having num_to_check == 0 or
- * start > 7 will always fail (ie return non-zero).
+ * start > 7 will always fail (i.e. return non-zero).
  */
 PNG_EXPORT(3, int, png_sig_cmp, (png_const_bytep sig, size_t start,
     size_t num_to_check));
 
 /* Simple signature checking function.  This is the same as calling
- * png_check_sig(sig, n) := !png_sig_cmp(sig, 0, n).
+ * png_check_sig(sig, n) := (png_sig_cmp(sig, 0, n) != 0).
  */
-#define png_check_sig(sig, n) !png_sig_cmp((sig), 0, (n))
+#define png_check_sig(sig, n) (png_sig_cmp((sig), 0, (n)) != 0)
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory. */
 PNG_EXPORTA(4, png_structp, png_create_read_struct,
@@ -3299,9 +3299,12 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #ifdef PNG_MIPS_MSA_API_SUPPORTED
 #  define PNG_MIPS_MSA   6 /* HARDWARE: MIPS Msa SIMD instructions supported */
 #endif
-#define PNG_IGNORE_ADLER32 8
+#ifdef PNG_DISABLE_ADLER32_CHECK_SUPPORTED
+#  define PNG_IGNORE_ADLER32 8 /* SOFTWARE: disable Adler32 check on IDAT */
+#endif
 #ifdef PNG_POWERPC_VSX_API_SUPPORTED
-#  define PNG_POWERPC_VSX   10 /* HARDWARE: PowerPC VSX SIMD instructions supported */
+#  define PNG_POWERPC_VSX   10 /* HARDWARE: PowerPC VSX SIMD instructions
+                                * supported */
 #endif
 #ifdef PNG_MIPS_MMI_API_SUPPORTED
 #  define PNG_MIPS_MMI   12 /* HARDWARE: MIPS MMI SIMD instructions supported */

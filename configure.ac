@@ -1,6 +1,6 @@
 # configure.ac
 
-# Copyright (c) 2018-2023 Cosmin Truta
+# Copyright (c) 2018-2024 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
 
 # This code is released under the libpng license.
@@ -25,8 +25,8 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.41.git],[png-mng-implement@lists.sourceforge.net])
-AC_CONFIG_MACRO_DIR([scripts])
+AC_INIT([libpng],[1.6.41],[png-mng-implement@lists.sourceforge.net])
+AC_CONFIG_MACRO_DIR([scripts/autoconf])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
 # color-tests requires automake 1.11 or later
@@ -46,7 +46,7 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.6.41.git
+PNGLIB_VERSION=1.6.41
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=6
 PNGLIB_RELEASE=41

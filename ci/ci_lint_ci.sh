@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-# Copyright (c) 2019-2023 Cosmin Truta.
+# Copyright (c) 2019-2024 Cosmin Truta.
 #
-# Use, modification and distribution are subject
-# to the Boost Software License, Version 1.0.
-# See the accompanying file LICENSE_BSL_1_0.txt
-# or visit http://www.boost.org/LICENSE_1_0.txt
+# Use, modification and distribution are subject to the MIT License.
+# Please see the accompanying file LICENSE_MIT.txt
 #
-# SPDX-License-Identifier: BSL-1.0
+# SPDX-License-Identifier: MIT
 
 # shellcheck source="ci/lib/ci.lib.sh"
 source "$(dirname "$0")/lib/ci.lib.sh"
@@ -52,17 +50,28 @@ function ci_lint_ci_scripts {
 
 function ci_lint_ci_scripts_license {
     ci_info "linting: CI scripts license"
-    ci_spawn grep -F "Boost Software License" ci/LICENSE_BSL_1_0.txt || {
-        ci_warn "bad or missing CI license file: '$CI_SCRIPT_DIR/LICENSE_BSL_1_0.txt'"
+    ci_spawn grep -F "MIT License" ci/LICENSE_MIT.txt || {
+        ci_warn "bad or missing CI license file: '$CI_SCRIPT_DIR/LICENSE_MIT.txt'"
         CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
     }
 }
 
+function usage {
+    echo "usage: $CI_SCRIPT_NAME"
+    exit 0
+}
+
 function main {
-    [[ $# -eq 0 ]] || {
-        ci_info "usage: $CI_SCRIPT_NAME"
-        ci_err "unexpected command argument: '$1'"
-    }
+    local opt
+    while getopts ":" opt
+    do
+        # This ain't a while-loop. It only pretends to be.
+        [[ $1 == -[?h]* || $1 == --help ]] && usage
+        ci_err "unknown option: '$1'"
+    done
+    shift $((OPTIND - 1))
+    # And... go!
+    [[ $# -eq 0 ]] || ci_err "unexpected argument: '$1'"
     ci_lint_ci_config_files
     ci_lint_ci_scripts
     ci_lint_ci_scripts_license

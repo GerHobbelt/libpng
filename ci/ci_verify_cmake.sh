@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-# Copyright (c) 2019-2023 Cosmin Truta.
+# Copyright (c) 2019-2024 Cosmin Truta.
 #
-# Use, modification and distribution are subject
-# to the Boost Software License, Version 1.0.
-# See the accompanying file LICENSE_BSL_1_0.txt
-# or visit http://www.boost.org/LICENSE_1_0.txt
+# Use, modification and distribution are subject to the MIT License.
+# Please see the accompanying file LICENSE_MIT.txt
 #
-# SPDX-License-Identifier: BSL-1.0
+# SPDX-License-Identifier: MIT
 
 # shellcheck source="ci/lib/ci.lib.sh"
 source "$(dirname "$0")/lib/ci.lib.sh"
@@ -169,12 +167,25 @@ function ci_build {
     ci_info "## END OF BUILD ##"
 }
 
+function usage {
+    echo "usage: $CI_SCRIPT_NAME"
+    exit 0
+}
+
 function main {
+    local opt
+    while getopts ":" opt
+    do
+        # This ain't a while-loop. It only pretends to be.
+        [[ $1 == -[?h]* || $1 == --help ]] && usage
+        ci_err "unknown option: '$1'"
+    done
+    shift $((OPTIND - 1))
     ci_init_build
     ci_trace_build
     [[ $# -eq 0 ]] || {
-        ci_info "note: this program accepts environment options only (see above)"
-        ci_err "unexpected command argument: '$1'"
+        ci_info "note: this program accepts environment options only"
+        ci_err "unexpected argument: '$1'"
     }
     ci_cleanup_old_build
     ci_build
