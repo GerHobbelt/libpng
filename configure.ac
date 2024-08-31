@@ -334,6 +334,9 @@ AC_ARG_ENABLE([hardware-optimizations],
          enable_mips_msa=no
          AC_DEFINE([PNG_MIPS_MSA_OPT], [0],
            [Disable MIPS_MSA optimizations])
+         enable_mips_mmi=no
+         AC_DEFINE([PNG_MIPS_MMI_OPT], [0],
+           [Disable MIPS_MMI optimizations])
          enable_loongson_mmi=no
          AC_DEFINE([PNG_LOONGSON_MMI_OPT], [0],
            [Disable LOONGSON_MMI optimizations])
@@ -343,6 +346,9 @@ AC_ARG_ENABLE([hardware-optimizations],
          enable_intel_sse=no
          AC_DEFINE([PNG_INTEL_SSE_OPT], [0],
            [Disable INTEL_SSE optimizations])
+         enable_loongarch_lsx=no
+         AC_DEFINE([PNG_LOONGARCH_LSX_OPT], [0],
+           [Disable LOONGARCH_LSX optimizations])
          ;;
       *)
          # allow enabling hardware optimization on any system:
@@ -358,7 +364,10 @@ AC_ARG_ENABLE([hardware-optimizations],
                 [Enable LOONGSON_MMI optimizations])
               ;;
             mipsel*|mips64el*)
+              enable_mips_mmi=yes
               enable_mips_msa=yes
+              AC_DEFINE([PNG_MIPS_MMI_OPT], [1],
+                [Enable MIPS_MMI optimizations])
               AC_DEFINE([PNG_MIPS_MSA_OPT], [0],
                 [Enable MIPS_MSA optimizations])
               ;;
@@ -371,6 +380,11 @@ AC_ARG_ENABLE([hardware-optimizations],
               enable_powerpc_vsx=yes
               AC_DEFINE([PNG_POWERPC_VSX_OPT], [2],
                 [Enable POWERPC VSX optimizations])
+              ;;
+            loongarch*)
+              enable_loongarch_lsx=yes
+              AC_DEFINE([PNG_LOONGARCH_LSX_OPT], [1],
+                [Enable LOONGARCH_LSX optimizations])
               ;;
          esac
          ;;
@@ -514,6 +528,51 @@ AM_CONDITIONAL([PNG_LOONGSON_MMI],
       *)    test "$enable_loongson_mmi" != '';;
     esac])
 
+# MIPS
+# ===
+#
+# MIPS MMI (SIMD) support.
+
+AC_ARG_ENABLE([mips-mmi],
+   AS_HELP_STRING([[[--enable-mips-mmi]]],
+      [Enable MIPS MMI optimizations: =no/off, check, api, yes/on:]
+      [no/off: disable the optimizations; check: use internal checking code]
+      [(deprecated and poorly supported); api: disable by default, enable by]
+      [a call to png_set_option; yes/on: turn on unconditionally.]
+      [If not specified: determined by the compiler.]),
+   [case "$enableval" in
+      no|off)
+         # disable the default enabling on __mips_mmi systems:
+         AC_DEFINE([PNG_MIPS_MMI_OPT], [0],
+                   [Disable MIPS MMI optimizations])
+         # Prevent inclusion of the assembler files below:
+         enable_mips_mmi=no;;
+      check)
+         AC_DEFINE([PNG_MIPS_MMI_CHECK_SUPPORTED], [],
+                   [Check for MIPS MMI support at run-time]);;
+      api)
+         AC_DEFINE([PNG_MIPS_MMI_API_SUPPORTED], [],
+                   [Turn on MIPS MMI optimizations at run-time]);;
+      yes|on)
+         AC_DEFINE([PNG_MIPS_MMI_OPT], [1],
+                   [Enable MIPS MMI optimizations])
+         AC_MSG_WARN([--enable-mips-mmi: please specify 'check' or 'api', if]
+            [you want the optimizations unconditionally pass '-mloongson-mmi -march=loongson3a']
+            [to the compiler.]);;
+      *)
+         AC_MSG_ERROR([--enable-mips-mmi=${enable_mips_mmi}: invalid value])
+   esac])
+
+# Add MIPS specific files to all builds where the host_cpu is mips ('mips*') or
+# where MIPS optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'mips*')
+
+AM_CONDITIONAL([PNG_MIPS_MMI],
+   [test "$enable_mips_mmi" != 'no' &&
+    case "$host_cpu" in
+      mipsel*|mips64el*) :;;
+    esac])
+
 # INTEL
 # =====
 #
@@ -595,6 +654,69 @@ AM_CONDITIONAL([PNG_POWERPC_VSX],
     case "$host_cpu" in
       powerpc*|ppc64*) : ;;
       *)  test "$enable_powerpc_vsx" != '';;
+    esac])
+
+# LOONGARCH
+# ===
+#
+# LOONGARCH LSX (SIMD) support
+
+if test "$LSX_CFLAGS" = ''; then
+    LSX_CFLAGS="-mlsx"
+fi
+
+compiler_support_loongarch_lsx=no
+AC_MSG_CHECKING(whether to use loongarch LSX intrinsics)
+save_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $LSX_CFLAGS"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include<lsxintrin.h>
+int main(){
+    __m128i a, b, c;
+    a = __lsx_vadd_w(b, c);
+    return 0;
+}]])],compiler_support_loongarch_lsx=yes)
+CFLAGS=$save_CFLAGS
+AC_MSG_RESULT($compiler_support_loongarch_lsx)
+
+AC_ARG_ENABLE([loongarch-lsx],
+   AS_HELP_STRING([[[--enable-loongarch-lsx]]],
+      [Enable LOONGARCH LSX optimizations: =no/off, yes/on:]
+      [no/off: disable the optimizations;]
+      [yes/on: turn on unconditionally.]
+      [If not specified: determined by the compiler.]),
+   [case "$enableval" in
+      no|off)
+         # disable the default enabling on __loongarch_simd systems:
+         AC_DEFINE([PNG_LOONGARCH_LSX_OPT], [0],
+                   [Disable LOONGARCH LSX optimizations])
+         # Prevent inclusion of the assembler files below:
+         enable_loongarch_lsx=no;;
+      yes|on)
+         AC_DEFINE([PNG_LOONGARCH_LSX_OPT], [1],
+                   [Enable LOONGARCH LSX optimizations])
+         ;;
+      *)
+         AC_MSG_ERROR([--enable-loongarch-lsx=${enable_loongarch_lsx}: invalid value])
+   esac])
+
+if test "$enable_loongarch_lsx" != 'no'; then
+   if test $compiler_support_loongarch_lsx = yes; then
+      AC_DEFINE([PNG_LOONGARCH_LSX_OPT], [1], [Enable LOONGARCH LSX optimizations])
+   else
+      AC_MSG_WARN([Compiler does not support loongarch LSX.])
+   fi
+fi
+
+# Add LOONGARCH specific files to all builds where the host_cpu is loongarch ('loongarch*') or
+# where LOONGARCH optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'loongarch*')
+
+AM_CONDITIONAL([PNG_LOONGARCH_LSX],
+   [test "$enable_loongarch_lsx" != 'no' && test $compiler_support_loongarch_lsx = yes &&
+    case "$host_cpu" in
+      loongarch*) :;;
+      *)    test "$enable_loongarch_lsx" != '';;
     esac])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
