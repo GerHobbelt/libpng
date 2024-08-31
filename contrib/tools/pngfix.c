@@ -1007,11 +1007,18 @@ file_end(struct file *file)
 
    if (file->out != NULL)
    {
-      int ef = 0;
-      ef += ferror(file->out);
-      ef += fflush(file->out);
-      ef += fclose(file->out);
-      if (ef != 0)
+      /* On some systems 'fclose' deletes the FILE struct (making it
+       * inaccessbile).  There is no guarantee that fclose returns an error
+       * code from fflush or, indeed, from the FILE error indicator.  There is
+       * also no explicit (or clear) guarantee in the standard that anything
+       * other than a read or write operation sets the error indicator; fflush
+       * is not a read or write operation, so both conditions must be checked
+       * to ensure the close succeeded and in ANSI-C conformant code they must
+       * be checked before the fclose call.
+       */
+      const int err = fflush(file->out) || ferror(file->out);
+
+      if (fclose(file->out) || err)
       {
          perror(file->out_name);
          emit_error(file, READ_ERROR_CODE, "output write error");
