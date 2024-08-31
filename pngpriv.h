@@ -37,7 +37,7 @@
  * still required (as of 2011-05-02.)
  */
 #ifndef _POSIX_SOURCE
-# define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
+#  define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
 #endif
 
 #ifndef PNG_VERSION_INFO_ONLY
@@ -197,7 +197,8 @@
 #endif /* PNG_ARM_NEON_OPT > 0 */
 
 #ifndef PNG_MIPS_MSA_OPT
-#  if defined(__mips_msa) && (__mips_isa_rev >= 5) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#  if defined(__mips_msa) && (__mips_isa_rev >= 5) && \
+   defined(PNG_ALIGNED_MEMORY_SUPPORTED)
 #     define PNG_MIPS_MSA_OPT 2
 #  else
 #     define PNG_MIPS_MSA_OPT 0
@@ -206,7 +207,8 @@
 
 #ifndef PNG_MIPS_MMI_OPT
 #  ifdef PNG_MIPS_MMI
-#    if defined(__mips_loongson_mmi) && (_MIPS_SIM == _ABI64) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#    if defined(__mips_loongson_mmi) && (_MIPS_SIM == _ABI64) && \
+     defined(PNG_ALIGNED_MEMORY_SUPPORTED)
 #       define PNG_MIPS_MMI_OPT 1
 #    else
 #       define PNG_MIPS_MMI_OPT 0
