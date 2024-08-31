@@ -43,6 +43,8 @@
 #  include <zlib-ng.h>
 #endif
 
+#undef verbose
+
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
