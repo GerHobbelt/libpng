@@ -3,7 +3,7 @@
  *
  * libpng version 1.6.41.git
  *
- * Copyright (c) 2018-2023 Cosmin Truta
+ * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -27,8 +27,8 @@
  * PNG Reference Library License version 2
  * ---------------------------------------
  *
- *  * Copyright (c) 1995-2023 The PNG Reference Library Authors.
- *  * Copyright (c) 2018-2023 Cosmin Truta.
+ *  * Copyright (c) 1995-2024 The PNG Reference Library Authors.
+ *  * Copyright (c) 2018-2024 Cosmin Truta.
  *  * Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
  *  * Copyright (c) 1996-1997 Andreas Dilger.
  *  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -944,7 +944,7 @@ PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), PNGARG((jmp_buf, int)), typedef);
 #define PNG_TRANSFORM_GRAY_TO_RGB   0x2000      /* read only */
 /* Added to libpng-1.5.4 */
 #define PNG_TRANSFORM_EXPAND_16     0x4000      /* read only */
-#if INT_MAX >= 0x8000 /* else this might break */
+#if ~0U > 0xffffU /* or else this might break on a 16-bit machine */
 #define PNG_TRANSFORM_SCALE_16      0x8000      /* read only */
 #endif
 
@@ -1825,12 +1825,9 @@ PNG_EXPORT(97, void, png_free, (png_const_structrp png_ptr, png_voidp ptr));
 PNG_EXPORT(98, void, png_free_data, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 free_me, int num));
 
-/* Reassign responsibility for freeing existing data, whether allocated
+/* Reassign the responsibility for freeing existing data, whether allocated
  * by libpng or by the application; this works on the png_info structure passed
- * in, it does not change the state for other png_info structures.
- *
- * It is unlikely that this function works correctly as of 1.6.0 and using it
- * may result either in memory leaks or double free of allocated data.
+ * in, without changing the state for other png_info structures.
  */
 PNG_EXPORT(99, void, png_data_freer, (png_const_structrp png_ptr,
     png_inforp info_ptr, int freer, png_uint_32 mask));

@@ -1,6 +1,6 @@
 /* pngcp.c
  *
- * Copyright (c) 2016,2022 John Cunningham Bowler
+ * Copyright (c) 2016,2022,2024 John Cunningham Bowler
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -92,16 +92,6 @@
 #else
 #  define voidcast(type, value) (value)
 #endif /* __cplusplus */
-
-#ifdef __GNUC__
-   /* Many versions of GCC erroneously report that local variables unmodified
-    * within the scope of a setjmp may be clobbered.  This hacks round the
-    * problem (sometimes) without harming other compilers.
-    */
-#  define gv volatile
-#else
-#  define gv
-#endif
 
 /* 'CLOCK_PROCESS_CPUTIME_ID' is one of the clock timers for clock_gettime.  It
  * need not be supported even when clock_gettime is available.  It returns the
@@ -400,6 +390,7 @@ struct display
 {
    jmp_buf          error_return;      /* Where to go to on error */
    unsigned int     errset;            /* error_return is set */
+   int              errlevel;          /* error level from longjmp */
 
    const char      *operation;         /* What is happening */
    const char      *filename;          /* The name of the original file */
@@ -639,7 +630,10 @@ display_log(struct display *dp, error_level level, const char *fmt, ...)
    if (level > APP_FAIL || (level > ERRORS && !(dp->options & CONTINUE)))
    {
       if (dp->errset)
+      {
+         dp->errlevel = level;
          longjmp(dp->error_return, level);
+      }
 
       else
          exit(99);
