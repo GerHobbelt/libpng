@@ -81,7 +81,7 @@ extract(FILE *fp, png_uint_32 *proflen)
       }
 
       else
-	result = no_profile;
+         result = no_profile;
    }
 
    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
@@ -156,7 +156,7 @@ extract_one_file(const char *filename)
       }
 
       else if (verbose && profile == no_profile)
-	printf("%s has no profile\n", filename);
+         printf("%s has no profile\n", filename);
    }
 
    else
