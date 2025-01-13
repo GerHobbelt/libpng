@@ -1513,6 +1513,29 @@ png_write_bKGD(png_structrp png_ptr, png_const_color_16p back, int color_type)
 }
 #endif
 
+#ifdef PNG_WRITE_cICP_SUPPORTED
+/* Write the cICP data */
+void /* PRIVATE */
+png_write_cICP(png_structrp png_ptr,
+               png_byte colour_primaries, png_byte transfer_function,
+               png_byte matrix_coefficients, png_byte video_full_range_flag)
+{
+   png_byte buf[4];
+
+   png_debug(1, "in png_write_cICP");
+
+   png_write_chunk_header(png_ptr, png_cICP, 4);
+
+   buf[0] = colour_primaries;
+   buf[1] = transfer_function;
+   buf[2] = matrix_coefficients;
+   buf[3] = video_full_range_flag;
+   png_write_chunk_data(png_ptr, buf, 4);
+
+   png_write_chunk_end(png_ptr);
+}
+#endif
+
 #ifdef PNG_WRITE_eXIf_SUPPORTED
 /* Write the Exif data */
 void /* PRIVATE */

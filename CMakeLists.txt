@@ -812,6 +812,8 @@ if(PNG_TESTS AND PNG_SHARED)
   list(SORT PNGSUITE_PNGS)
   file(GLOB TEST_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/*.png")
   list(SORT TEST_PNGS)
+  file(GLOB TEST_PNG3_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/png-3/*.png")
+  list(SORT TEST_PNG3_PNGS)
 
   set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
 
@@ -821,6 +823,10 @@ if(PNG_TESTS AND PNG_SHARED)
   png_add_test(NAME pngtest
                COMMAND pngtest
                FILES "${PNGTEST_PNG}")
+
+  png_add_test(NAME pngtest-png-3
+               COMMAND pngtest
+               FILES "${TEST_PNG3_PNGS}")
 
   add_executable(pngvalid ${pngvalid_sources})
   target_link_libraries(pngvalid PRIVATE png_shared)
