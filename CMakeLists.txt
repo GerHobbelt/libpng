@@ -640,6 +640,10 @@ if(PNG_FRAMEWORK)
   target_link_libraries(png_framework PRIVATE ZLIB::zlib ${M_LIBRARY})
 endif()
 
+target_include_directories(png
+                           PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+target_include_directories(png
+                           PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 target_link_libraries(png PRIVATE ZLIB::zlib ${M_LIBRARY})
 
 target_compile_definitions(png PUBLIC "$<$<CONFIG:Debug>:PNG_DEBUG>")
