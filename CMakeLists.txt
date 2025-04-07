@@ -157,13 +157,7 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
           CACHE STRING "Enable ARM NEON optimizations: on|off; on is default")
     else()
       set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
-       if(IOS)
-         set(neon_default "off")
-       else()
-         set(neon_default "check")
-       endif()
-       message("****neon_default: ${neon_default}")
-       set(PNG_ARM_NEON "${neon_default}"
+       set(PNG_ARM_NEON "off"
           CACHE STRING "Enable ARM NEON optimizations: check|on|off; off is default")
     endif()
     set_property(CACHE PNG_ARM_NEON
@@ -309,7 +303,8 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
 else(PNG_HARDWARE_OPTIMIZATIONS)
 
   # Set definitions and sources for ARM.
-  if(PNG_TARGET_ARCHITECTURE MATCHES "^(arm|aarch)")
+  if(PNG_TARGET_ARCHITECTURE MATCHES "^(arm|aarch)" OR
+     IOS)
     add_definitions(-DPNG_ARM_NEON_OPT=0)
   endif()
 
