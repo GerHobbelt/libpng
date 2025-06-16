@@ -155,9 +155,6 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
 
       else if (chunk_name == png_IDAT)
       {
-#ifdef PNG_READ_APNG_SUPPORTED
-         png_have_info(png_ptr, info_ptr);
-#endif
          png_ptr->idat_size = length;
          break;
       }

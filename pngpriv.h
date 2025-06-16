@@ -705,10 +705,6 @@
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000U /* Have another chunk after IDAT */
 #define PNG_WROTE_eXIf            0x4000U
 #define PNG_IS_READ_STRUCT        0x8000U /* Else is a write struct */
-#ifdef PNG_APNG_SUPPORTED
-#define PNG_HAVE_acTL            0x10000U
-#define PNG_HAVE_fcTL            0x20000U
-#endif
 
 /* Flags for the transformations the PNG library does on the image data */
 #define PNG_BGR                 0x0001U
@@ -972,16 +968,6 @@
 #define png_tIME PNG_U32(116,  73,  77,  69)
 #define png_tRNS PNG_U32(116,  82,  78,  83)
 #define png_zTXt PNG_U32(122,  84,  88, 116)
-
-#ifdef PNG_APNG_SUPPORTED
-#define png_acTL PNG_U32( 97,  99,  84,  76)
-#define png_fcTL PNG_U32(102,  99,  84,  76)
-#define png_fdAT PNG_U32(102, 100,  65,  84)
-
-/* For png_struct.apng_flags: */
-#define PNG_FIRST_FRAME_HIDDEN       0x0001U
-#define PNG_APNG_APP                 0x0002U
-#endif
 
 /* The following will work on (signed char*) strings, whereas the get_uint_32
  * macro will fail on top-bit-set values because of the sign extension.
