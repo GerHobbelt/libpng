@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.46.git
+ * libpng version 1.6.50.git
  *
  * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
@@ -14,7 +14,7 @@
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
  *   libpng versions 0.97, January 1998, through 1.6.35, July 2018:
  *     Glenn Randers-Pehrson
- *   libpng versions 1.6.36, December 2018, through 1.6.45, January 2025:
+ *   libpng versions 1.6.36, December 2018, through 1.6.49, June 2025:
  *     Cosmin Truta
  *   See also "Contributing Authors", below.
  */
@@ -259,7 +259,7 @@
  *    ...
  *    1.5.30                  15    10530  15.so.15.30[.0]
  *    ...
- *    1.6.45                  16    10645  16.so.16.45[.0]
+ *    1.6.49                  16    10649  16.so.16.49[.0]
  *
  *    Henceforth the source version will match the shared-library major and
  *    minor numbers; the shared-library major version number will be used for
@@ -352,7 +352,7 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.46.git"
+#define PNG_LIBPNG_VER_STRING "1.6.50.git"
 #define PNG_HEADER_VERSION_STRING " libpng version " PNG_LIBPNG_VER_STRING "\n"
 
 /* The versions of shared library builds should stay in sync, going forward */
@@ -363,7 +363,7 @@
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   6
-#define PNG_LIBPNG_VER_RELEASE 46
+#define PNG_LIBPNG_VER_RELEASE 50
 
 /* This should be zero for a public release, or non-zero for a
  * development version.
@@ -394,7 +394,7 @@
  * From version 1.0.1 it is:
  * XXYYZZ, where XX=major, YY=minor, ZZ=release
  */
-#define PNG_LIBPNG_VER 10646 /* 1.6.46.git */
+#define PNG_LIBPNG_VER 10650 /* 1.6.50.git */
 
 /* Library configuration: these options cannot be changed after
  * the library has been built.
@@ -519,7 +519,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_46_git;
+typedef char* png_libpng_version_1_6_50_git;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
@@ -1668,7 +1668,7 @@ PNG_EXPORT(226, void, png_set_text_compression_method, (png_structrp png_ptr,
 
 #ifdef PNG_STDIO_SUPPORTED
 /* Initialize the input/output for the PNG file to the default functions. */
-PNG_EXPORT(74, void, png_init_io, (png_structrp png_ptr, png_FILE_p fp));
+PNG_EXPORT(74, void, png_init_io, (png_structrp png_ptr, FILE *fp));
 #endif
 
 /* Replace the (error and abort), and warning functions with user
@@ -2103,27 +2103,27 @@ PNG_EXPORT(251, void, png_set_cICP, (png_const_structrp png_ptr,
 #ifdef PNG_cLLI_SUPPORTED
 PNG_FP_EXPORT(252, png_uint_32, png_get_cLLI, (png_const_structrp png_ptr,
          png_const_inforp info_ptr, double *maximum_content_light_level,
-         double *maximum_frame_average_light_level));
+         double *maximum_frame_average_light_level))
 PNG_FIXED_EXPORT(253, png_uint_32, png_get_cLLI_fixed,
     (png_const_structrp png_ptr, png_const_inforp info_ptr,
     /* The values below are in cd/m2 (nits) and are scaled by 10,000; not
      * 100,000 as in the case of png_fixed_point.
      */
     png_uint_32p maximum_content_light_level_scaled_by_10000,
-    png_uint_32p maximum_frame_average_light_level_scaled_by_10000));
+    png_uint_32p maximum_frame_average_light_level_scaled_by_10000))
 #endif
 
 #ifdef PNG_cLLI_SUPPORTED
 PNG_FP_EXPORT(254, void, png_set_cLLI, (png_const_structrp png_ptr,
          png_inforp info_ptr, double maximum_content_light_level,
-         double maximum_frame_average_light_level));
+         double maximum_frame_average_light_level))
 PNG_FIXED_EXPORT(255, void, png_set_cLLI_fixed, (png_const_structrp png_ptr,
     png_inforp info_ptr,
     /* The values below are in cd/m2 (nits) and are scaled by 10,000; not
      * 100,000 as in the case of png_fixed_point.
      */
     png_uint_32 maximum_content_light_level_scaled_by_10000,
-    png_uint_32 maximum_frame_average_light_level_scaled_by_10000));
+    png_uint_32 maximum_frame_average_light_level_scaled_by_10000))
 #endif
 
 #ifdef PNG_eXIf_SUPPORTED
@@ -2181,7 +2181,7 @@ PNG_FP_EXPORT(256, png_uint_32, png_get_mDCV, (png_const_structrp png_ptr,
     double *green_x, double *green_y, double *blue_x, double *blue_y,
     /* Mastering display luminance in cd/m2 (nits). */
     double *mastering_display_maximum_luminance,
-    double *mastering_display_minimum_luminance));
+    double *mastering_display_minimum_luminance))
 
 PNG_FIXED_EXPORT(257, png_uint_32, png_get_mDCV_fixed,
     (png_const_structrp png_ptr, png_const_inforp info_ptr,
@@ -2193,7 +2193,7 @@ PNG_FIXED_EXPORT(257, png_uint_32, png_get_mDCV_fixed,
      * 10,000.
      */
     png_uint_32p mastering_display_maximum_luminance_scaled_by_10000,
-    png_uint_32p mastering_display_minimum_luminance_scaled_by_10000));
+    png_uint_32p mastering_display_minimum_luminance_scaled_by_10000))
 #endif
 
 #ifdef PNG_mDCV_SUPPORTED
@@ -2206,7 +2206,7 @@ PNG_FP_EXPORT(258, void, png_set_mDCV, (png_const_structrp png_ptr,
     double green_y, double blue_x, double blue_y,
     /* Mastering display luminance in cd/m2 (nits). */
     double mastering_display_maximum_luminance,
-    double mastering_display_minimum_luminance));
+    double mastering_display_minimum_luminance))
 
 PNG_FIXED_EXPORT(259, void, png_set_mDCV_fixed, (png_const_structrp png_ptr,
     png_inforp info_ptr,
@@ -2221,7 +2221,7 @@ PNG_FIXED_EXPORT(259, void, png_set_mDCV_fixed, (png_const_structrp png_ptr,
      * must be zero.
      */
     png_uint_32 mastering_display_maximum_luminance_scaled_by_10000,
-    png_uint_32 mastering_display_minimum_luminance_scaled_by_10000));
+    png_uint_32 mastering_display_minimum_luminance_scaled_by_10000))
 #endif
 
 #ifdef PNG_oFFs_SUPPORTED
@@ -3186,7 +3186,7 @@ PNG_EXPORT(234, int, png_image_begin_read_from_file, (png_imagep image,
     */
 
 PNG_EXPORT(235, int, png_image_begin_read_from_stdio, (png_imagep image,
-   FILE* file));
+   FILE *file));
    /* The PNG header is read from the stdio FILE object. */
 #endif /* STDIO */
 
@@ -3261,7 +3261,7 @@ PNG_EXPORT(239, int, png_image_write_to_file, (png_imagep image,
 PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
    int convert_to_8_bit, const void *buffer, png_int_32 row_stride,
    const void *colormap));
-   /* Write the image to the given (FILE*). */
+   /* Write the image to the given FILE object. */
 #endif /* SIMPLIFIED_WRITE_STDIO */
 
 /* With all write APIs if image is in one of the linear formats with 16-bit
@@ -3401,26 +3401,45 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
  *           selected at run time.
  */
 #ifdef PNG_SET_OPTION_SUPPORTED
+
+/* HARDWARE: ARM Neon SIMD instructions supported */
 #ifdef PNG_ARM_NEON_API_SUPPORTED
-#  define PNG_ARM_NEON   0 /* HARDWARE: ARM Neon SIMD instructions supported */
-#endif
-#define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
-#define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
-#ifdef PNG_MIPS_MSA_API_SUPPORTED
-#  define PNG_MIPS_MSA   6 /* HARDWARE: MIPS Msa SIMD instructions supported */
-#endif
-#ifdef PNG_DISABLE_ADLER32_CHECK_SUPPORTED
-#  define PNG_IGNORE_ADLER32 8 /* SOFTWARE: disable Adler32 check on IDAT */
-#endif
-#ifdef PNG_POWERPC_VSX_API_SUPPORTED
-#  define PNG_POWERPC_VSX   10 /* HARDWARE: PowerPC VSX SIMD instructions
-                                * supported */
-#endif
-#ifdef PNG_MIPS_MMI_API_SUPPORTED
-#  define PNG_MIPS_MMI   12 /* HARDWARE: MIPS MMI SIMD instructions supported */
+#  define PNG_ARM_NEON 0
 #endif
 
-#define PNG_OPTION_NEXT  14 /* Next option - numbers must be even */
+/* SOFTWARE: Force maximum window */
+#define PNG_MAXIMUM_INFLATE_WINDOW 2
+
+/* SOFTWARE: Check ICC profile for sRGB */
+#define PNG_SKIP_sRGB_CHECK_PROFILE 4
+
+/* HARDWARE: MIPS MSA SIMD instructions supported */
+#ifdef PNG_MIPS_MSA_API_SUPPORTED
+#  define PNG_MIPS_MSA 6
+#endif
+
+/* SOFTWARE: Disable Adler32 check on IDAT */
+#ifdef PNG_DISABLE_ADLER32_CHECK_SUPPORTED
+#  define PNG_IGNORE_ADLER32 8
+#endif
+
+/* HARDWARE: PowerPC VSX SIMD instructions supported */
+#ifdef PNG_POWERPC_VSX_API_SUPPORTED
+#  define PNG_POWERPC_VSX 10
+#endif
+
+/* HARDWARE: MIPS MMI SIMD instructions supported */
+#ifdef PNG_MIPS_MMI_API_SUPPORTED
+#  define PNG_MIPS_MMI 12
+#endif
+
+/* HARDWARE: RISC-V RVV SIMD instructions supported */
+#ifdef PNG_RISCV_RVV_API_SUPPORTED
+#  define PNG_RISCV_RVV 14
+#endif
+
+/* Next option - numbers must be even */
+#define PNG_OPTION_NEXT 16
 
 
 #ifdef PNG_LOONGSON_MMI_API_SUPPORTED

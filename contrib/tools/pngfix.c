@@ -34,7 +34,7 @@
 #endif
 
 #if PNG_LIBPNG_VER < 10603 /* 1.6.3 */
-#  error "pngfix will not work with libpng prior to 1.6.3"
+#  error pngfix requires libpng version 1.6.3 or newer
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -70,7 +70,7 @@
 #endif
 
 #ifndef PNG_MAXIMUM_INFLATE_WINDOW
-#  error "pngfix not supported in this libpng version"
+#  error pngfix requires libpng with PNG_MAXIMUM_INFLATE_WINDOW supported
 #endif
 
 #if ZLIBNG_VERNUM >= 0x1240
