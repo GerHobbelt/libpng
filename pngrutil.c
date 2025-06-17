@@ -4213,38 +4213,6 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
          uInt avail_in;
          png_bytep buffer;
 
-#ifdef PNG_READ_APNG_SUPPORTED
-         png_uint_32 bytes_to_skip = 0;
-
-         while (png_ptr->idat_size == 0 || bytes_to_skip != 0)
-         {
-            png_crc_finish(png_ptr, bytes_to_skip);
-            bytes_to_skip = 0;
-
-            png_ptr->idat_size = png_read_chunk_header(png_ptr);
-            if (png_ptr->num_frames_read == 0)
-            {
-               if (png_ptr->chunk_name != png_IDAT)
-                  png_error(png_ptr, "Not enough image data");
-            }
-            else
-            {
-               if (png_ptr->chunk_name == png_IEND)
-                  png_error(png_ptr, "Not enough image data");
-               if (png_ptr->chunk_name != png_fdAT)
-               {
-                  png_warning(png_ptr, "Skipped (ignored) a chunk "
-                                       "between APNG chunks");
-                  bytes_to_skip = png_ptr->idat_size;
-                  continue;
-               }
-
-               png_ensure_sequence_number(png_ptr, png_ptr->idat_size);
-
-               png_ptr->idat_size -= 4;
-            }
-         }
-#else
          while (png_ptr->idat_size == 0)
          {
             png_crc_finish(png_ptr, 0);
@@ -4256,7 +4224,6 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
             if (png_ptr->chunk_name != png_IDAT)
                png_error(png_ptr, "Not enough image data");
          }
-#endif /* PNG_READ_APNG_SUPPORTED */
 
          avail_in = png_ptr->IDAT_read_size;
 
@@ -4328,9 +4295,6 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
 
          png_ptr->mode |= PNG_AFTER_IDAT;
          png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
-#ifdef PNG_READ_APNG_SUPPORTED
-         png_ptr->num_frames_read++;
-#endif
 
          if (png_ptr->zstream.avail_in > 0 || png_ptr->idat_size > 0)
             png_chunk_benign_error(png_ptr, "Extra compressed data");
@@ -4740,80 +4704,4 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }
-
-#ifdef PNG_READ_APNG_SUPPORTED
-/* This function is to be called after the main IDAT set has been read and
- * before a new IDAT is read. It resets some parts of png_ptr
- * to make them usable by the read functions again */
-void /* PRIVATE */
-png_read_reset(png_structp png_ptr)
-{
-    png_ptr->mode &= ~PNG_HAVE_IDAT;
-    png_ptr->mode &= ~PNG_AFTER_IDAT;
-    png_ptr->row_number = 0;
-    png_ptr->pass = 0;
-}
-
-void /* PRIVATE */
-png_read_reinit(png_structp png_ptr, png_infop info_ptr)
-{
-    png_ptr->width = info_ptr->next_frame_width;
-    png_ptr->height = info_ptr->next_frame_height;
-    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth,png_ptr->width);
-    png_ptr->info_rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth,
-        png_ptr->width);
-    if (png_ptr->prev_row != NULL)
-        memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
-}
-
-#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-/* same as png_read_reset() but for the progressive reader */
-void /* PRIVATE */
-png_progressive_read_reset(png_structp png_ptr)
-{
-#ifdef PNG_READ_INTERLACING_SUPPORTED
-    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
-
-    /* Start of interlace block */
-    static const png_byte png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
-
-    /* Offset to next interlace block */
-    static const png_byte png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
-
-    /* Start of interlace block in the y direction */
-    static const png_byte png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
-
-    /* Offset to next interlace block in the y direction */
-    static const png_byte png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
-
-    if (png_ptr->interlaced != 0)
-    {
-        if ((png_ptr->transformations & PNG_INTERLACE) == 0)
-            png_ptr->num_rows = (png_ptr->height + png_pass_yinc[0] - 1 -
-                                png_pass_ystart[0]) / png_pass_yinc[0];
-        else
-            png_ptr->num_rows = png_ptr->height;
-
-        png_ptr->iwidth = (png_ptr->width +
-                           png_pass_inc[png_ptr->pass] - 1 -
-                           png_pass_start[png_ptr->pass]) /
-                           png_pass_inc[png_ptr->pass];
-    }
-    else
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
-    {
-        png_ptr->num_rows = png_ptr->height;
-        png_ptr->iwidth = png_ptr->width;
-    }
-    png_ptr->flags &= ~PNG_FLAG_ZSTREAM_ENDED;
-    if (zng_inflateReset(&(png_ptr->zstream)) != Z_OK)
-        png_error(png_ptr, "inflateReset failed");
-    png_ptr->zstream.avail_in = 0;
-    png_ptr->zstream.next_in = 0;
-    png_ptr->zstream.next_out = png_ptr->row_buf;
-    png_ptr->zstream.avail_out = (uInt)PNG_ROWBYTES(png_ptr->pixel_depth,
-        png_ptr->iwidth) + 1;
-}
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
-#endif /* PNG_READ_APNG_SUPPORTED */
 #endif /* READ */

@@ -832,7 +832,6 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_INFO_fcTL 0x200000U /* PNGv3: 1.6.45: unknown */
 #define PNG_INFO_fdAT 0x400000U /* PNGv3: 1.6.45: unknown */
 
-
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
  * the routines for other purposes.
@@ -3434,6 +3433,17 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
 /*******************************************************************************
  *  END OF HARDWARE AND SOFTWARE OPTIONS
  ******************************************************************************/
+
+/* Maintainer: Put new public prototypes here ^, in libpng.3, in project
+ * defs, and in scripts/symbols.def.
+ */
+
+/* The last ordinal number (this is the *last* one already used; the next
+ * one to use is one more than this.)
+ */
+#ifdef PNG_EXPORT_LAST_ORDINAL
+  PNG_EXPORT_LAST_ORDINAL(259);
+#endif
 
 #ifdef __cplusplus
 }

@@ -1313,7 +1313,8 @@ buffer_write(struct display *dp, struct buffer *buffer, png_bytep data,
          buffer->last = last; /* avoid the need to rewrite every time */
          end_count = 0;
       }
-      if(last != NULL){
+      if(last != NULL)
+      {
          avail = (sizeof last->buffer) - end_count;
          if (avail > size)
             avail = size;
