@@ -322,18 +322,15 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
   # Set definitions and sources for RISC-V.
   if(PNG_TARGET_ARCHITECTURE MATCHES "^(riscv)")
     include(CheckCCompilerFlag)
-    set(PNG_RISCV_RVV_POSSIBLE_VALUES check on off)
+    set(PNG_RISCV_RVV_POSSIBLE_VALUES on off)
     set(PNG_RISCV_RVV "off"
-      CACHE STRING "Enable RISC-V Vector optimizations: check|on|off; off is default")
+      CACHE STRING "Enable RISC-V Vector optimizations: on|off; off is default")
     set_property(CACHE PNG_RISCV_RVV
                 PROPERTY STRINGS ${PNG_RISCV_RVV_POSSIBLE_VALUES})
     list(FIND PNG_RISCV_RVV_POSSIBLE_VALUES ${PNG_RISCV_RVV} index)
     if(index EQUAL -1)
       message(FATAL_ERROR "PNG_RISCV_RVV must be one of [${PNG_RISCV_RVV_POSSIBLE_VALUES}]")
     elseif(NOT PNG_RISCV_RVV STREQUAL "off")
-
-      set(_SAVED_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
-      set(CMAKE_REQUIRED_FLAGS "-march=rv64gv1p0")
 
       check_c_source_compiles("
         #include <riscv_vector.h>
@@ -349,8 +346,6 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
           return (int)__riscv_vfmv_f_s_f32m1_f32(val);
       }" COMPILER_SUPPORTS_RVV)
 
-      set(CMAKE_REQUIRED_FLAGS ${_SAVED_CMAKE_REQUIRED_FLAGS})
-
       if(NOT COMPILER_SUPPORTS_RVV)
         message(FATAL_ERROR "Compiler does not support RISC-V Vector extension or its unable to detect it")
       endif()
@@ -359,8 +354,8 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
           riscv/riscv_init.c)
       if(PNG_RISCV_RVV STREQUAL "on")
         add_definitions(-DPNG_RISCV_RVV_OPT=2)
-      elseif(PNG_RISCV_RVV STREQUAL "check")
-        add_definitions(-DPNG_RISCV_RVV_CHECK_SUPPORTED)
+      else()
+        add_definitions(-DPNG_RISCV_RVV_OPT=0)
       endif()
     else()
       add_definitions(-DPNG_RISCV_RVV_OPT=0)
