@@ -93,7 +93,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="..\NuGetter\managed\LibPng-Tekla.redist.props">
       <Filter>NuGetter\managed</Filter>
     </None>
@@ -121,5 +120,11 @@
     <None Include="..\NuGetter\BuildLocalNuget.bat">
       <Filter>NuGetter</Filter>
     </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\NuGetter\build.txt">
+      <Filter>NuGetter</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -51,7 +51,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{f9c0a26a-d9a2-4ffc-8eae-0806ae2f46e8}</ProjectGuid>
     <RootNamespace>LibPngStatic</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <SccProjectName>SAK</SccProjectName>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>

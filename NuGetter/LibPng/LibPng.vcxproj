@@ -31,7 +31,7 @@
     <ProjectGuid>{D4A6C816-6BA1-436D-A581-70198401C720}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>LibPng</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <SccProjectName>SAK</SccProjectName>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
@@ -279,21 +279,22 @@
     <None Include="..\NuGetter\LibPng-Tekla.Static.targets" />
     <None Include="..\NuGetter\managed\LibPng-Tekla.redist.props" />
     <None Include="..\NuGetter\managed\LibPng-Tekla.redist.targets" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LibPng.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Text Include="..\NuGetter\build.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\zlib-ng.1.9.9-tekla7\build\native\zlib-ng.targets" Condition="Exists('..\packages\zlib-ng.1.9.9-tekla7\build\native\zlib-ng.targets')" />
+    <Import Project="..\packages\zlib-ng.2.0.7-technology-1\build\native\zlib-ng.targets" Condition="Exists('..\packages\zlib-ng.2.0.7-technology-1\build\native\zlib-ng.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\zlib-ng.1.9.9-tekla7\build\native\zlib-ng.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib-ng.1.9.9-tekla7\build\native\zlib-ng.targets'))" />
+    <Error Condition="!Exists('..\packages\zlib-ng.2.0.7-technology-1\build\native\zlib-ng.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib-ng.2.0.7-technology-1\build\native\zlib-ng.targets'))" />
   </Target>
 </Project>
