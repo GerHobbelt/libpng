@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <BuildDependsOn>$(BuildDependsOn);LibPngTeklaRedist</BuildDependsOn>
+  </PropertyGroup>
+  <Target Name="LibPngTeklaRedist">
+    <ItemGroup Condition="'$(Platform)'=='x64'">
+      <LibPngTeklaRedistFiles Include="$(MSBuildThisFileDirectory)..\native\bin\x64\v142\*" />
+    </ItemGroup>
+    <Message Text="Platform=$(Platform)" />
+    <Copy SourceFiles="@(LibPngTeklaRedistFiles)" DestinationFolder="$(OutDir)" />
+  </Target>
+</Project>

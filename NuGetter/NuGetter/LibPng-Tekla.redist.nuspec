@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>LibPng-Tekla.redist</id>
+    <version>0.0.0-localbuild</version>
+    <authors>Glenn Randers-Pehrson, Trimble Technology</authors>
+    <licenseUrl>http://www.libpng.org/pub/png/libpng.html</licenseUrl>
+    <projectUrl>https://github.com/trimble-oss/libpng</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Redistributable components for package 'LibPng-Tekla'.</description>
+    <title>LibPng (Tekla build) Redist</title>
+    <tags>LibPng  native  nativepackage</tags>
+  </metadata>
+  <files>
+    <file src="LibPng-Tekla.redist.targets" target="\build\native\" />
+
+    <file src="..\Build\x64\140-Release\LibPng-*.dll" target="\build\native\bin\x64\v140\" />
+    <file src="..\Build\x64\142-Release\LibPng-*.dll" target="\build\native\bin\x64\v142\" />
+
+    <file src="..\Build\x64\140-DebugCRT\LibPng-*.dll" target="\build\native\bin\x64\v140\DebugCRT\" />
+    <file src="..\Build\x64\142-DebugCRT\LibPng-*.dll" target="\build\native\bin\x64\v142\DebugCRT\" />
+
+    <file src="managed\LibPng-Tekla.redist.props" target="\build\net\" />
+    <file src="managed\LibPng-Tekla.redist.targets" target="\build\net\" />
+  </files>
+</package>

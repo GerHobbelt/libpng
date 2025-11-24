@@ -1,0 +1,34 @@
+<Project>
+ <PropertyGroup>
+	<GenerateProjectSpecificOutputFolder>false</GenerateProjectSpecificOutputFolder> <!-- needed for UWP -->
+ </PropertyGroup>
+
+    <!-- Default version for local build. -->
+ <PropertyGroup>
+	<MajorVersion Condition="'$(MajorVersion)'==''">0</MajorVersion>
+  <MinorVersion Condition="'$(MinorVersion)'==''">0</MinorVersion>
+	<PatchVersion Condition="'$(PatchVersion)'==''">0</PatchVersion>
+  <BuildVersion Condition="'$(BuildVersion)'==''">0</BuildVersion>
+ </PropertyGroup>
+ 
+ <ItemDefinitionGroup>
+   <ClCompile>
+     <PreprocessorDefinitions>%(PreprocessorDefinitions);MAJORVERSION=$(MajorVersion);MINORVERSION=$(MinorVersion);PATCHVERSION=$(PatchVersion);BUILDVERSION=$(BuildVersion)</PreprocessorDefinitions>
+   </ClCompile>
+   <ResourceCompile>
+	   <PreprocessorDefinitions>MAJORVERSION=$(MajorVersion);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+	   <PreprocessorDefinitions>MINORVERSION=$(MinorVersion);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+	   <PreprocessorDefinitions>PATCHVERSION=$(PatchVersion);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+	   <PreprocessorDefinitions>BUILDVERSION=$(BuildVersion);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+	   <PreprocessorDefinitions>PRODVER=$(MajorVersion).$(MinorVersion).$(PatchVersion);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+   </ResourceCompile>
+ </ItemDefinitionGroup>
+
+  <!--<Target Name="SetProjectVersion" BeforeTargets="Build">
+	<Exec Command="echo %BUILD_BUILDNUMBER% %Platform% %PROMPT%" />
+    <Exec Command="echo MajorVersion %MajorVersion%, $(MajorVersion)" />
+    <SetEnv Name="BUILD_BUILDNUMBER" Prefix="false" Value="$(MajorVersion).$(MinorVersion).$(PatchVersion).$(BuildVersion)" />
+    <Exec Command="echo %BUILD_BUILDNUMBER%" />
+  </Target>-->
+
+</Project>

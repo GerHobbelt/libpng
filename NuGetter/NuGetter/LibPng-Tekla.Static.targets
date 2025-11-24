@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="v140 Release" Condition="'$(PlatformToolset.ToLower())' == 'v140' And $(Configuration.ToLower().IndexOf('debugcrt')) == -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)\lib\$(Platform)\v140\LibPng.Static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="v141 Release" Condition="'$(PlatformToolset.ToLower())' == 'v141' And $(Configuration.ToLower().IndexOf('debugcrt')) == -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)\lib\$(Platform)\v140\LibPng.Static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="v142 Release" Condition="'$(PlatformToolset.ToLower())' == 'v142' And $(Configuration.ToLower().IndexOf('debugcrt')) == -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)\lib\$(Platform)\v142\LibPng.Static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="v143 Release" Condition="'$(PlatformToolset.ToLower())' == 'v143' And $(Configuration.ToLower().IndexOf('debugcrt')) == -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)\lib\$(Platform)\v142\LibPng.Static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="v140 DebugCRT" Condition="'$(PlatformToolset.ToLower())' == 'v140' And $(Configuration.ToLower().IndexOf('debugcrt')) &gt; -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)\lib\$(Platform)\v140\DebugCRT\LibPng.Static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="v141 DebugCRT" Condition="'$(PlatformToolset.ToLower())' == 'v141' And $(Configuration.ToLower().IndexOf('debugcrt')) &gt; -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)\lib\$(Platform)\v140\DebugCRT\LibPng.Static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="v142 DebugCRT" Condition="'$(PlatformToolset.ToLower())' == 'v142' And $(Configuration.ToLower().IndexOf('debugcrt')) &gt; -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)\lib\$(Platform)\v142\DebugCRT\LibPng.Static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="v143 DebugCRT" Condition="'$(PlatformToolset.ToLower())' == 'v143' And $(Configuration.ToLower().IndexOf('debugcrt')) &gt; -1">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)\lib\$(Platform)\v142\DebugCRT\LibPng.Static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+</Project>

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ItemGroup Label="v140 Release" Condition="'$(PlatformToolset.ToLower())' == 'v140' And $(Configuration.ToLower().IndexOf('debugcrt')) == -1">
+    <LibPngTeklaRedistFiles Include="$(MSBuildThisFileDirectory)\bin\$(Platform)\v140\*" />
+  </ItemGroup>
+  <ItemGroup Label="v141 Release" Condition="'$(PlatformToolset.ToLower())' == 'v141' And $(Configuration.ToLower().IndexOf('debugcrt')) == -1">
+    <LibPngTeklaRedistFiles Include="$(MSBuildThisFileDirectory)\bin\$(Platform)\v140\*" />
+  </ItemGroup>
+  <ItemGroup Label="v142 Release" Condition="'$(PlatformToolset.ToLower())' == 'v142' And $(Configuration.ToLower().IndexOf('debugcrt')) == -1">
+    <LibPngTeklaRedistFiles Include="$(MSBuildThisFileDirectory)\bin\$(Platform)\v142\*" />
+  </ItemGroup>
+  <ItemGroup Label="v143 Release" Condition="'$(PlatformToolset.ToLower())' == 'v143' And $(Configuration.ToLower().IndexOf('debugcrt')) == -1">
+    <LibPngTeklaRedistFiles Include="$(MSBuildThisFileDirectory)\bin\$(Platform)\v142\*" />
+  </ItemGroup>
+  <ItemGroup Label="v140 DebugCRT" Condition="'$(PlatformToolset.ToLower())' == 'v140' And $(Configuration.ToLower().IndexOf('debugcrt')) &gt; -1">
+    <LibPngTeklaRedistFiles Include="$(MSBuildThisFileDirectory)\bin\$(Platform)\v140\DebugCRT\*" />
+  </ItemGroup>
+  <ItemGroup Label="v141 DebugCRT" Condition="'$(PlatformToolset.ToLower())' == 'v141' And $(Configuration.ToLower().IndexOf('debugcrt')) &gt; -1">
+    <LibPngTeklaRedistFiles Include="$(MSBuildThisFileDirectory)\bin\$(Platform)\v140\DebugCRT\*" />
+  </ItemGroup>
+  <ItemGroup Label="v142 DebugCRT" Condition="'$(PlatformToolset.ToLower())' == 'v142' And $(Configuration.ToLower().IndexOf('debugcrt')) &gt; -1">
+    <LibPngTeklaRedistFiles Include="$(MSBuildThisFileDirectory)\bin\$(Platform)\v142\DebugCRT\*" />
+  </ItemGroup>
+  <ItemGroup Label="v143 DebugCRT" Condition="'$(PlatformToolset.ToLower())' == 'v143' And $(Configuration.ToLower().IndexOf('debugcrt')) &gt; -1">
+    <LibPngTeklaRedistFiles Include="$(MSBuildThisFileDirectory)\bin\$(Platform)\v142\DebugCRT\*" />
+  </ItemGroup>
+  <Target Name="LibPng-Tekla_redist_AfterBuild" AfterTargets="AfterBuild" >
+    <Message Text="PlatformToolset=$(PlatformToolset), Configuration=$(Configuration), Platform=$(Platform)" />
+    <Copy SourceFiles="@(LibPngTeklaRedistFiles)" DestinationFolder="$(OutDir)" />
+  </Target>
+</Project>

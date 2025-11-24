@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>LibPng-Tekla</id>
+    <version>0.0.0-localbuild</version>
+    <authors>Glenn Randers-Pehrson, Trimble Technology</authors>
+    <licenseUrl>http://www.libpng.org/pub/png/libpng.html</licenseUrl>
+    <projectUrl>https://github.com/trimble-oss/libpng</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The native libpng library (x64, v140/v141->v140/v142/v143->v142, Release/DebugCRT).</description>
+    <title>LibPng (Tekla build)</title>
+    <tags>LibPng  native  nativepackage</tags>
+  </metadata>
+  <files>
+    <file src="LibPng-Tekla.targets" target="\build\native\" />
+
+    <file src="..\..\*.h" target="\build\native\include\" />
+    <file src="..\LibPng\pnglibconf.h" target="\build\native\include\" />
+
+    <file src="..\Build\x64\140-Release\LibPng.lib" target="\build\native\lib\x64\v140\" />
+    <file src="..\Build\x64\142-Release\LibPng.lib" target="\build\native\lib\x64\v142\" />
+
+    <file src="..\Build\x64\140-DebugCRT\LibPng.lib" target="\build\native\lib\x64\v140\DebugCRT\" />
+    <file src="..\Build\x64\142-DebugCRT\LibPng.lib" target="\build\native\lib\x64\v142\DebugCRT\" />
+  </files>
+</package>
