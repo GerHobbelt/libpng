@@ -2,7 +2,7 @@
 
 set Major=1
 set Minor=6
-set Patch=51
+set Patch=53
 set /p Build=<build.txt
 set /a Build+=1
 echo %Build% >build.txt
