@@ -93,7 +93,7 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
       png_write_sig(png_ptr);
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
-      if ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) != 0 && \
+      if ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) != 0 && 
           png_ptr->mng_features_permitted != 0)
       {
          png_warning(png_ptr,
@@ -1868,7 +1868,7 @@ png_image_set_PLTE(png_image_write_control *display)
    png_uint_32 format = image->format;
    unsigned int channels = PNG_IMAGE_SAMPLE_CHANNELS(format);
 
-#   if defined(PNG_FORMAT_BGR_SUPPORTED) &&\
+#   if defined(PNG_FORMAT_BGR_SUPPORTED) && \
       defined(PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED)
       int afirst = (format & PNG_FORMAT_FLAG_AFIRST) != 0 &&
           (format & PNG_FORMAT_FLAG_ALPHA) != 0;
