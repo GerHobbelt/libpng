@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>LibPng-Tekla.symbols</id>
+    <version>0.0.0-localbuild</version>
+    <authors>Glenn Randers-Pehrson, Trimble Technology</authors>
+    <licenseUrl>http://www.libpng.org/pub/png/libpng.html</licenseUrl>
+    <projectUrl>https://github.com/trimble-oss/libpng</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Symbols for package 'LibPng-Tekla.redist'.</description>
+    <title>LibPng (Tekla build) Symbols</title>
+    <tags>LibPng  native  symbols</tags>
+  </metadata>
+  <files>
+    <file src="LibPng-Tekla.symbols.targets" target="\build\native\" />
+
+    <file src="..\Build\x64\140-Release\LibPng-*.pdb" target="\build\native\bin\x64\v140\" />
+    <file src="..\Build\x64\142-Release\LibPng-*.pdb" target="\build\native\bin\x64\v142\" />
+
+    <file src="..\Build\x64\140-DebugCRT\LibPng-*.pdb" target="\build\native\bin\x64\v140\DebugCRT\" />
+    <file src="..\Build\x64\142-DebugCRT\LibPng-*.pdb" target="\build\native\bin\x64\v142\DebugCRT\" />
+  </files>
+</package>
