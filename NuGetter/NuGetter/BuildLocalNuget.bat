@@ -4,7 +4,7 @@ xcopy.exe /y ..\..\scripts\pnglibconf.h.prebuilt ..\LibPng\pnglibconf.h
 
 set Major=1
 set Minor=6
-set Patch=55
+set Patch=56
 set /p Build=<build.txt
 set /a Build+=1
 echo %Build% >build.txt
