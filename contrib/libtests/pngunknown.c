@@ -501,7 +501,7 @@ read_callback(png_structp pp, png_unknown_chunkp pc)
     */
    display *d = voidcast(display*, png_get_user_chunk_ptr(pp));
    int chunk = findb(pc->name);
-   int keep, discard;
+   int keep, discard = 0;
 
    if (chunk < 0) /* not one in our list, so not a known chunk */
       keep = d->keep;
