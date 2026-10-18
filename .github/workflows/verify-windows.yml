@@ -13,6 +13,9 @@ on:
       - libpng16
       - libpng18
 
+permissions:
+  contents: read
+
 jobs:
   verify-windows:
     strategy:
@@ -24,7 +27,7 @@ jobs:
             cmake_generator_platform: x64
           - os: windows-11-arm
             vcpkg_triplet: arm64-windows
-            cmake_generator: Visual Studio 17 2022
+            cmake_generator: Visual Studio 18 2026
             cmake_generator_platform: ARM64
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
