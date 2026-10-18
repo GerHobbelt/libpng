@@ -13,7 +13,7 @@ ACLOCAL_AMFLAGS = -I scripts/autoconf
 
 # test programs - run on make check, make distcheck
 if ENABLE_TESTS
-check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage pngcp pngadhoc
+check_PROGRAMS= pngtest pnggetset pngunknown pngstest pngvalid pngimage pngcp pngadhoc
 if HAVE_CLOCK_GETTIME
 check_PROGRAMS += timepng
 endif
@@ -41,6 +41,9 @@ BUILT_SOURCES = pnglibconf.h
 if ENABLE_TESTS
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+pnggetset_SOURCES = contrib/libtests/pnggetset.c
+pnggetset_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngvalid_SOURCES = contrib/libtests/pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -76,6 +79,7 @@ pngadhoc_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 if ENABLE_TESTS
 TESTS =\
    tests/pngtest-all\
+   tests/pnggetset\
    tests/pngtest-nonpng\
    tests/pngvalid-gamma-alpha-mode\
    tests/pngvalid-gamma-background\
@@ -312,9 +316,10 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 pngtest.o: pnglibconf.h
 
 contrib/libtests/makepng.o: pnglibconf.h
+contrib/libtests/pnggetset.o: pnglibconf.h
+contrib/libtests/pngimage.o: pnglibconf.h
 contrib/libtests/pngstest.o: pnglibconf.h
 contrib/libtests/pngunknown.o: pnglibconf.h
-contrib/libtests/pngimage.o: pnglibconf.h
 contrib/libtests/pngvalid.o: pnglibconf.h
 contrib/libtests/pngadhoc.o: pnglibconf.h
 contrib/libtests/readpng.o: pnglibconf.h
